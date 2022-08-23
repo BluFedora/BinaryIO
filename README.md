@@ -1,5 +1,9 @@
 # BinaryIO : Library for managing binary data streams in C++
 
+![Windows Build Badge](https://github.com/BluFedora/BinaryIO/actions/workflows/build_windows.yml/badge.svg)
+![Linux Build Badge](https://github.com/BluFedora/BinaryIO/actions/workflows/build_linux.yml/badge.svg)
+![macOS Build Badge](https://github.com/BluFedora/BinaryIO/actions/workflows/build_macos.yml/badge.svg)
+
 BinaryIO is a small base C++ library for a unified binary stream interface with
 some helpers for easily implementing custom binary file formats.
 

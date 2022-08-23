@@ -23,6 +23,8 @@ add_library(
       "src/binary_io.cpp"
 )
 
+set_property(TARGET AssetIO_BinaryIO PROPERTY CXX_STANDARD 17)
+
 target_include_directories(
   AssetIO_BinaryIO
 

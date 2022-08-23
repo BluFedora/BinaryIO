@@ -1,6 +1,6 @@
 /******************************************************************************/
 /*!
- * @file   rel_ptr.h
+ * @file   rel_ptr.hpp
  * @author Shareef Raheem (https://blufedora.github.io)
  * @date   2021-09-19
  * @brief

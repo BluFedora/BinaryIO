@@ -1,4 +1,4 @@
-# BinaryIO : Library for managing binary data streams in C++
+# BinaryIO : C++ library for managing binary data streams
 
 ![Windows Build Badge](https://github.com/BluFedora/BinaryIO/actions/workflows/build_windows.yml/badge.svg)
 ![Linux Build Badge](https://github.com/BluFedora/BinaryIO/actions/workflows/build_linux.yml/badge.svg)
@@ -28,7 +28,7 @@ some helpers for easily implementing custom binary file formats.
 - `byteWriterViewFromVector` : Function for creating a buffer view from a standard vector.
 - `CFileBufferedByteReader`  : C File IByteReader implementation.
 
-[assetio/rel_ptr.hpp](include/assetio/rel_ptr.hpp): Contains a pointer type that stores the relative offset from itself to the pointer object for making memory mappable binary file formats.
+[assetio/rel_ptr.hpp](include/assetio/rel_ptr.hpp): Contains a pointer type that stores the relative offset from itself to the pointed object for making memory mappable binary file formats.
 
 - `rel_ptr<IntType, T>`                 : Class for the relative pointer.
 - `rel_array<CountIntType, RelPtrType>` : Class for an array that contains data relative to it's own address.

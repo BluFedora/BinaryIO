@@ -17,6 +17,7 @@
 #include <algorithm>  // rotate
 #include <cstdio>     // fprintf, stderr
 #include <cstdlib>    // abort
+#include <cstring>    // memcpy
 #include <iterator>   // begin, end
 #include <utility>    // exchange
 

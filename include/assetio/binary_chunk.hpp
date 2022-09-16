@@ -90,6 +90,8 @@ inline constexpr std::uint32_t operator""_crc32(const char* s, std::size_t size)
 
 namespace assetio
 {
+  using VersionType = std::uint16_t;
+
   // Chunked Data Format
   //
   // header                 : BinaryChunkHeader;
@@ -97,6 +99,26 @@ namespace assetio
   // data                   : byte[header.data_size]
   // footer                 : BinaryChunkFooter;
   //
+
+  enum class BinaryChunkParts : std::uint32_t
+  {
+    Header           = (1 << 0),
+    Data             = (1 << 1),
+    Footer           = (1 << 2),
+    HeaderData       = Header | Data,
+    HeaderFooter     = Header | Footer,
+    DataFooter       = Data | Footer,
+    HeaderDataFooter = Header | Data | Footer,
+  };
+  inline BinaryChunkParts operator|(const BinaryChunkParts lhs, const BinaryChunkParts rhs)
+  {
+    return BinaryChunkParts(std::uint32_t(lhs) | std::uint32_t(rhs));
+  }
+
+  inline BinaryChunkParts operator&(const BinaryChunkParts lhs, const BinaryChunkParts rhs)
+  {
+    return BinaryChunkParts(std::uint32_t(lhs) & std::uint32_t(rhs));
+  }
 
   struct BinaryChunkTypeID
   {
@@ -132,7 +154,7 @@ namespace assetio
   struct BinaryChunkHeader
   {
     BinaryChunkTypeID type_id;      //!< The chunk's type.
-    std::uint16_t     version;      //!< Version number starting at 0.
+    VersionType       version;      //!< Version number starting at 0.
     std::uint16_t     header_size;  //!< Number of bytes to skip from the beginning of this header to get to the data.
     std::uint64_t     data_size;    //!< Size in bytes of the chunk's data.
 
@@ -152,16 +174,28 @@ namespace assetio
     {
     }
 
-    std::uint64_t             totalSize() const { return header_size + data_size + sizeof(BinaryChunkFooter); }
-    void*                     data() { return reinterpret_cast<char*>(this) + header_size; }
-    struct BinaryChunkFooter* footer() { return reinterpret_cast<BinaryChunkFooter*>(reinterpret_cast<char*>(data()) + data_size); }
+    std::uint64_t sizeInfo(const BinaryChunkParts parts = BinaryChunkParts::HeaderDataFooter)
+    {
+      std::uint64_t result = 0u;
+
+      if (std::uint32_t(parts & BinaryChunkParts::Header) != 0u) { result += header_size; }
+      if (std::uint32_t(parts & BinaryChunkParts::Data) != 0u) { result += data_size; }
+      if (std::uint32_t(parts & BinaryChunkParts::Footer) != 0u) { result += sizeof(BinaryChunkFooter); }
+
+      return result;
+    }
+
+    BinaryChunkHeader* header() { return this; }
+    void*              data() { return reinterpret_cast<char*>(header()) + header_size; }
+    BinaryChunkFooter* footer() { return reinterpret_cast<BinaryChunkFooter*>(reinterpret_cast<char*>(data()) + data_size); }
+    const void*        endOfChunk() { return footer() + 1u; }
   };
   static_assert(sizeof(BinaryChunkHeader) == 16u, "");
 
   //
   // Helper base class so that the header_size does not have to be passed in manually.
   //
-  template<typename SubClass, std::uint16_t k_Version>
+  template<typename SubClass, VersionType k_Version>
   struct BaseBinaryChunkHeader : public BinaryChunkHeader
   {
     using Base = BaseBinaryChunkHeader<SubClass, k_Version>;

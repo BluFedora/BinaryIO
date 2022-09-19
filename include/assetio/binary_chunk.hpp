@@ -60,11 +60,11 @@ inline static constexpr std::uint32_t k_Crc32Table[256] =
 };
 // clang-format on
 
-inline constexpr std::uint32_t k_crc32InitialSeed = 0xFFFFFFFF;
-
 // crc-32b
-inline constexpr std::uint32_t crc32(const char* bytes, std::size_t num_bytes, std::uint32_t crc)
+inline constexpr std::uint32_t crc32(const char* bytes, std::size_t num_bytes)
 {
+  std::uint32_t crc = 0xFFFFFFFF;
+
   for (std::size_t i = 0; i < num_bytes; ++i)
   {
     crc = (crc >> 8) ^ k_Crc32Table[(bytes[i] ^ crc) & 0xFF];
@@ -73,8 +73,10 @@ inline constexpr std::uint32_t crc32(const char* bytes, std::size_t num_bytes, s
   return ~crc;
 }
 
-inline constexpr std::uint32_t crc32(const char* bytes, std::uint32_t crc)
+inline constexpr std::uint32_t crc32(const char* bytes)
 {
+  std::uint32_t crc = 0xFFFFFFFF;
+
   while (*bytes)
   {
     crc = (crc >> 8) ^ k_Crc32Table[(*bytes++ ^ crc) & 0xFF];
@@ -85,7 +87,7 @@ inline constexpr std::uint32_t crc32(const char* bytes, std::uint32_t crc)
 
 inline constexpr std::uint32_t operator""_crc32(const char* s, std::size_t size)
 {
-  return crc32(s, size, k_crc32InitialSeed);
+  return crc32(s, size);
 }
 
 namespace assetio

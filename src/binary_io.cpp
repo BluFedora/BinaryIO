@@ -29,7 +29,7 @@ namespace assetio
   {
     if (!expr)
     {
-      std::fprintf(stderr, "RelPtr [%s:%i] Assertion '%s' failed, %s.\n", filename, line_number, expr_str, assert_msg);
+      std::fprintf(stderr, "BinaryIO[%s:%i] Assertion '%s' failed, %s.\n", filename, line_number, expr_str, assert_msg);
       std::abort();
     }
 
@@ -43,7 +43,7 @@ namespace assetio
     const char* const        data   = static_cast<const char*>(chunk_header->data());
     BinaryChunkFooter* const footer = chunk_header->footer();
 
-    footer->crc32_checksum = crc32(data, chunk_header->data_size, k_crc32InitialSeed);
+    footer->crc32_checksum = crc32(data, chunk_header->data_size);
   }
 
   // binary_stream.hpp

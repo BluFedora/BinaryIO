@@ -133,7 +133,7 @@ namespace assetio
     void typeCheck()
     {
       static_assert(CHAR_BIT == 8, "CHAR_BIT != 8");
-      static_assert(std::is_integral_v<T>, "Byte ordering is for integer types.");
+      static_assert(std::is_integral_v<T>, "Byte ordering is for integral types.");
     }
 
     template<typename T, typename F>
@@ -182,7 +182,6 @@ namespace assetio
     const std::uint8_t* const src = reinterpret_cast<const std::uint8_t*>(&value);
     std::uint8_t* const       dst = reinterpret_cast<std::uint8_t*>(&result);
 
-    //  std::reverse_copy(src.raw.begin(), src.raw.end(), dst.raw.begin());
     for (std::size_t i = 0; i < sizeof(T); ++i)
     {
       dst[i] = src[sizeof(T) - i - 1];

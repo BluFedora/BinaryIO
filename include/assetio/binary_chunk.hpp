@@ -176,7 +176,7 @@ namespace assetio
     {
     }
 
-    std::uint64_t sizeInfo(const BinaryChunkParts parts = BinaryChunkParts::HeaderDataFooter)
+    std::uint64_t sizeInfo(const BinaryChunkParts parts = BinaryChunkParts::HeaderDataFooter) const
     {
       std::uint64_t result = 0u;
 

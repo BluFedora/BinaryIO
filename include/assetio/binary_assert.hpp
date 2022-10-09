@@ -6,7 +6,7 @@
  * @brief
  *   Binary IO Library Assertion functionality.
  *
- *   TODO(SR): Variadic args for error message.
+ * @todo Variadic args for error message to assert.
  *
  * @copyright Copyright (c) 2022 Shareef Abdoul-Raheem
  */

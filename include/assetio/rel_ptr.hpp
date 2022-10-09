@@ -66,12 +66,15 @@ namespace assetio
     {
     }
 
-    // This datatype should not be copied or moved automatically.
+    //
+    // Default Copy / Move behavior is in place to allow the type act trivially (for serialization purposes).
+    // but this behavior is undesireable since the offset will not be updated.
+    //
 
-    rel_ptr(const rel_ptr& rhs) = delete;
-    rel_ptr(rel_ptr&& rhs)      = delete;
-    rel_ptr& operator=(const rel_ptr& rhs) = delete;
-    rel_ptr& operator=(rel_ptr&& rhs) = delete;
+    rel_ptr(const rel_ptr& rhs)            = default;
+    rel_ptr(rel_ptr&& rhs)                 = default;
+    rel_ptr& operator=(const rel_ptr& rhs) = default;
+    rel_ptr& operator=(rel_ptr&& rhs)      = default;
 
     // Assignment Operators //
 

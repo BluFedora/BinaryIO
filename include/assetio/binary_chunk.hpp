@@ -93,6 +93,7 @@ inline constexpr std::uint32_t operator""_crc32(const char* s, std::size_t size)
 namespace assetio
 {
   using VersionType = std::uint16_t;
+  using ChunkTypeID = std::uint32_t;
 
   // Chunked Data Format
   //
@@ -122,23 +123,34 @@ namespace assetio
     return BinaryChunkParts(std::uint32_t(lhs) & std::uint32_t(rhs));
   }
 
+  inline constexpr ChunkTypeID MakeBinaryChunkTypeID(const char (&id)[4 + 1 /* NUL Terminated */])
+  {
+    return (ChunkTypeID(id[0]) << 0u) | (ChunkTypeID(id[1]) << 8u) |
+           (ChunkTypeID(id[2]) << 16u) | (ChunkTypeID(id[3]) << 24u);
+  }
+
   struct BinaryChunkTypeID
   {
-    char type_id[4];  //!< Four byte identifier indicating the chunk's type.
+    ChunkTypeID type_id;  //!< Four byte identifier indicating the chunk's type.
 
-    constexpr BinaryChunkTypeID(const char (&id)[4 + 1 /* NUL Terminated */] = "\0\0\0\0") :
-      type_id{id[0], id[1], id[2], id[3]}
+    constexpr BinaryChunkTypeID(const ChunkTypeID id = 0u) :
+      type_id{id}
+    {
+    }
+
+    constexpr BinaryChunkTypeID(const char (&id)[4 + 1 /* NUL Terminated */]) :
+      type_id{MakeBinaryChunkTypeID(id)}
     {
     }
 
     friend inline bool operator==(const BinaryChunkTypeID& lhs, const BinaryChunkTypeID& rhs)
     {
-      return *reinterpret_cast<const std::uint32_t*>(&lhs) == *reinterpret_cast<const std::uint32_t*>(&rhs);
+      return lhs.type_id == rhs.type_id;
     }
 
     friend inline bool operator!=(const BinaryChunkTypeID& lhs, const BinaryChunkTypeID& rhs)
     {
-      return !(lhs == rhs);
+      return lhs.type_id != rhs.type_id;
     }
   };
   static_assert(sizeof(BinaryChunkTypeID) == sizeof(std::uint32_t), "");
@@ -197,13 +209,15 @@ namespace assetio
   //
   // Helper base class so that the header_size does not have to be passed in manually.
   //
-  template<typename SubClass, VersionType k_Version>
+  template<typename SubClass, VersionType k_Version, ChunkTypeID k_ChunkTypeID>
   struct BaseBinaryChunkHeader : public BinaryChunkHeader
   {
-    using Base = BaseBinaryChunkHeader<SubClass, k_Version>;
+    static constexpr BinaryChunkTypeID ChunkID = k_ChunkTypeID;
 
-    explicit BaseBinaryChunkHeader(const BinaryChunkTypeID& id, std::uint64_t data_size) :
-      BinaryChunkHeader(id, k_Version, data_size, sizeof(SubClass))
+    using Base = BaseBinaryChunkHeader<SubClass, k_Version, k_ChunkTypeID>;
+
+    explicit BaseBinaryChunkHeader(const std::uint64_t data_size) :
+      BinaryChunkHeader(ChunkID, k_Version, data_size, sizeof(SubClass))
     {
       static_assert(sizeof(Base) == sizeof(BinaryChunkHeader), "This helper should not add to the size of the header.");
       static_assert(std::is_base_of_v<Base, SubClass>, "CRTP, the template argument must be passed in.");

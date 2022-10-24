@@ -129,17 +129,10 @@ namespace assetio
 
   namespace detail
   {
-    template<typename T>
-    void typeCheck()
-    {
-      static_assert(CHAR_BIT == 8, "CHAR_BIT != 8");
-      static_assert(std::is_integral_v<T>, "Byte ordering is for integral types.");
-    }
-
     template<typename T, typename F>
     IOResult writeXEndian(IByteWriter& writer, const T value, F&& convertIndex) noexcept
     {
-      typeCheck<T>();
+      static_assert(std::is_integral_v<T>, "Byte ordering is for integral types.");
 
       alignas(T) std::uint8_t bytes[sizeof(T)];
 
@@ -154,7 +147,7 @@ namespace assetio
     template<typename T, typename F>
     IOResult readXEndian(IByteReader& reader, T* value, F&& convertIndex) noexcept
     {
-      typeCheck<T>();
+      static_assert(std::is_integral_v<T>, "Byte ordering is for integral types.");
 
       std::uint8_t   bytes[sizeof(T)];
       const IOResult result = reader.read(bytes, sizeof(bytes));
@@ -176,7 +169,7 @@ namespace assetio
   template<typename T>
   T swapEndian(const T value) noexcept
   {
-    detail::typeCheck<T>();
+    static_assert(std::is_integral_v<T>, "Byte ordering is for integral types.");
 
     T                         result;
     const std::uint8_t* const src = reinterpret_cast<const std::uint8_t*>(&value);

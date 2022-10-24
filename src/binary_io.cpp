@@ -36,7 +36,7 @@ namespace assetio
     return expr;
   }
 
-  // binary_chunk
+  // binary_chunk.hpp
 
   void ChunkUtils::writeChecksum(BinaryChunkHeader* chunk_header)
   {

@@ -15,7 +15,7 @@
 #ifndef REL_PTR_HPP
 #define REL_PTR_HPP
 
-#include "binary_assert.hpp"  // bfBinaryAssert
+#include "binary_assert.hpp"  // binaryIOAssert
 
 #include <climits>      // CHAR_BIT
 #include <cstdint>      // int8_t, int16_t, int32_t int64_t, uint8_t, uint16_t, uint32_t uint64_t
@@ -115,14 +115,17 @@ namespace assetio
      */
     static offset_type calculateOffset(T* const rhs, const alignment_type* base)
     {
-      if (!rhs) { return 0; }
+      if (rhs)
+      {
+        const std::ptrdiff_t off = reinterpret_cast<const alignment_type*>(rhs) - base;
 
-      const std::ptrdiff_t off = reinterpret_cast<const alignment_type*>(rhs) - base;
+        binaryIOAssert(reinterpret_cast<std::uintptr_t>(rhs) % k_AlignmentByteCount == 0, "Invalid pointer alignment, decrease alignment_type.");
+        binaryIOAssert(off >= k_OffsetMin && off <= k_OffsetMax, "Pointer out of range, increase offset_type.");
 
-      binaryIOAssert(reinterpret_cast<std::uintptr_t>(rhs) % k_AlignmentByteCount == 0, "Invalid pointer alignment, decrease alignment_type.");
-      binaryIOAssert(off >= k_OffsetMin && off <= k_OffsetMax, "Pointer out of range, increase offset_type.");
+        return static_cast<offset_type>(off);
+      }
 
-      return static_cast<offset_type>(off);
+      return 0;
     }
 
     friend inline bool operator==(const rel_ptr& lhs, const rel_ptr& rhs)

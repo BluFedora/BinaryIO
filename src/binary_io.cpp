@@ -189,9 +189,9 @@ namespace assetio
   {
     binaryIOAssert(file != nullptr, "Invalid file handle.");
 
-    buffer_start = nullptr;
-    cursor       = nullptr;
-    buffer_end   = nullptr;
+    buffer_start = m_LocalBuffer;
+    cursor       = m_LocalBuffer;
+    buffer_end   = m_LocalBuffer;
     last_result  = IOResult::Success;
     refill_fn    = [](IByteReader* self_) -> IOResult {
       CFileBufferedByteReader* const self = static_cast<CFileBufferedByteReader*>(self_);
@@ -201,36 +201,33 @@ namespace assetio
         return self->setFailureState(IOResult::EndOfStream);
       }
 
-      std::uint8_t* const local_buffer_bgn    = std::begin(self->m_LocalBuffer);
-      std::uint8_t* const local_buffer_end    = std::end(self->m_LocalBuffer);
-      std::uint8_t* const local_buffer_cursor = const_cast<std::uint8_t*>(self->cursor);
-      std::uint8_t* const write_start         = std::rotate(local_buffer_bgn, local_buffer_cursor, local_buffer_end);
-      const std::size_t   num_bytes_in_buffer = local_buffer_end - write_start;
+      std::uint8_t* const data_bgn            = const_cast<std::uint8_t*>(self->buffer_start);
+      std::uint8_t* const read_end            = const_cast<std::uint8_t*>(self->cursor);
+      std::uint8_t* const data_end            = const_cast<std::uint8_t*>(self->buffer_end);
+      std::uint8_t* const write_start         = std::rotate(data_bgn, read_end, data_end);
+      const std::size_t   num_bytes_in_buffer = std::end(self->m_LocalBuffer) - write_start;
       const std::size_t   num_bytes_read      = std::fread(write_start, sizeof(write_start[0]), num_bytes_in_buffer, self->m_FileHandle);
 
-      if (num_bytes_read != 0)
+      if (num_bytes_read != 0 || num_bytes_in_buffer == 0u)
       {
-        self->buffer_start = write_start;
-        self->cursor       = write_start;
+        self->buffer_start = data_bgn;
+        self->cursor       = self->buffer_start;
         self->buffer_end   = write_start + num_bytes_read;
+
+        return IOResult::Success;
+      }
+      else if (std::feof(self->m_FileHandle))
+      {
+        return self->setFailureState(IOResult::EndOfStream);
+      }
+      else if (std::ferror(self->m_FileHandle))
+      {
+        return self->setFailureState(IOResult::ReadError);
       }
       else
       {
-        if (std::feof(self->m_FileHandle))
-        {
-          return self->setFailureState(IOResult::EndOfStream);
-        }
-        else if (std::ferror(self->m_FileHandle))
-        {
-          return self->setFailureState(IOResult::ReadError);
-        }
-        else
-        {
-          return self->setFailureState(IOResult::UnknownError);
-        }
+        return self->setFailureState(IOResult::UnknownError);
       }
-
-      return IOResult::Success;
     };
   }
 }  // namespace assetio

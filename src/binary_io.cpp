@@ -59,9 +59,7 @@ namespace assetio
 
   IOResult ByteWriterView::write(const void* bytes, size_t num_bytes)
   {
-    binaryIOAssert(bytes != nullptr && num_bytes > 0, "Write must be called with a valid set of bytes.");
-
-    if (last_result == IOResult::Success)
+    if (bytes != nullptr && num_bytes != 0u && last_result == IOResult::Success)
     {
       last_result = callback(user_data, bytes, num_bytes);
     }

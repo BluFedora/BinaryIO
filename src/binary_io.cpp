@@ -110,6 +110,47 @@ namespace assetio
     return last_result;
   }
 
+  IOResult IByteReader::seek(const std::size_t offset, const SeekOrigin origin)
+  {
+    if (seek_fn)
+    {
+      return seek_fn(this, offset, origin);
+    }
+
+    const uint8_t* destination;
+    switch (origin)
+    {
+      case SeekOrigin::BEGIN:
+      {
+        destination = buffer_start + offset;
+        break;
+      }
+      case SeekOrigin::RELATIVE:
+      {
+        destination = cursor + offset;
+        break;
+      }
+      case SeekOrigin::END:
+      {
+        destination = buffer_end - offset;
+        break;
+      }
+      default:
+      {
+        binaryIOAssert(false, "Invalid seek origin.\n");
+        break;
+      }
+    }
+
+    if (buffer_start <= destination && destination <= buffer_end)
+    {
+      cursor = destination;
+      return IOResult::Success;
+    }
+
+    return IOResult::SeekError;
+  }
+
   IOResult IByteReader::setFailureState(IOResult err)
   {
     last_result = err;
@@ -178,6 +219,26 @@ namespace assetio
      buffer);
   }
 
+  ByteWriterView byteWriterViewFromFile(std::FILE* const file_handle)
+  {
+    return ByteWriterView{
+     [](void* user_data, const void* bytes, size_t num_bytes) -> IOResult {
+       std::FILE* const file = static_cast<std::FILE*>(user_data);
+
+       if (bytes != nullptr && num_bytes != 0u)
+       {
+         fwrite(bytes, sizeof(uint8_t), num_bytes, file);
+       }
+       else
+       {
+         fflush(file);
+       }
+
+       return IOResult::Success;
+     },
+     file_handle};
+  }
+
   //// CFileBufferedByteReader
 
   CFileBufferedByteReader::CFileBufferedByteReader(FILE* const file) :
@@ -226,6 +287,39 @@ namespace assetio
       {
         return self->setFailureState(IOResult::UnknownError);
       }
+    };
+    seek_fn = [](IByteReader* self_, const std::size_t offset, const SeekOrigin origin) -> IOResult {
+      CFileBufferedByteReader* const self = static_cast<CFileBufferedByteReader*>(self_);
+
+      const int file_origin = [origin]() -> int {
+        switch (origin)
+        {
+          case SeekOrigin::BEGIN: return SEEK_SET;
+          case SeekOrigin::RELATIVE: return SEEK_CUR;
+          case SeekOrigin::END: return SEEK_END;
+          default:
+          {
+            binaryIOAssert(false, "Invalid seek origin.\n");
+            break;
+          }
+        }
+
+        return -1;
+      }();
+
+#if _WIN32
+      if (_fseeki64(self->m_FileHandle, offset, file_origin) == 0)
+#else
+      if (fseeko(self->m_FileHandle, offset, file_origin) == 0)
+#endif
+      {
+        self->buffer_start = self->m_LocalBuffer;
+        self->cursor       = self->m_LocalBuffer;
+        self->buffer_end   = self->m_LocalBuffer;
+        return self->refill_fn(self);
+      }
+
+      return IOResult::SeekError;
     };
   }
 }  // namespace assetio

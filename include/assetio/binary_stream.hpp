@@ -38,6 +38,7 @@ namespace assetio
     EndOfStream,        //!< No more data in stream.
     AllocationFailure,  //!< Failed to allocate memory for internal stream operations.
     ReadError,          //!< Failed to get more data from stream.
+    SeekError,          //!< Invalid seek location.
     UnknownError,       //!< Unknown failure.
   };
 
@@ -97,6 +98,13 @@ namespace assetio
     ~ByteWriterView() override = default;
   };
 
+  enum class SeekOrigin
+  {
+    BEGIN,
+    RELATIVE,
+    END,
+  };
+
   /*!
    * @brief
    *   Interface for reading bytes.
@@ -107,17 +115,20 @@ namespace assetio
     // Post-condition : cursor == buffer_start, cursor < buffer_end.
     //         Return : last_result.
     using RefillFn = IOResult (*)(IByteReader* self);
+    using SeekFn   = IOResult (*)(IByteReader* self, const std::size_t offset, const SeekOrigin origin);
 
-    const uint8_t* buffer_start = nullptr;            //!< Start of buffer.
-    const uint8_t* cursor       = nullptr;            //!< Invariant: buffer_start <= cursor <= buffer_end, user code sets this.
-    const uint8_t* buffer_end   = nullptr;            //!< End of Buffer + 1, should not be read from.
-    IOResult       last_result  = IOResult::Success;  //!< Initialized to `IOResult::Success`.
-    RefillFn       refill_fn    = nullptr;            //!< Called when more data from the stream is needed.
+    const uint8_t*  buffer_start = nullptr;            //!< Start of buffer.
+    const uint8_t*  cursor       = nullptr;            //!< Invariant: buffer_start <= cursor <= buffer_end, user code sets this.
+    const uint8_t*  buffer_end   = nullptr;            //!< End of Buffer + 1, should not be read from.
+    IOResult        last_result  = IOResult::Success;  //!< Initialized to `IOResult::Success`.
+    RefillFn        refill_fn    = nullptr;            //!< Called when more data from the stream is needed.
+    SeekFn          seek_fn      = nullptr;            //!< Called when `IByteReader::seek` is called, if null then seek will work on the local buffer.
 
     inline IOResult refill() { return refill_fn(this); }
     inline size_t   bufferSize() const { return buffer_end - buffer_start; }
     inline size_t   numBytesAvailable() const { return buffer_end - cursor; }
     IOResult        read(void* const dst_bytes, const std::size_t num_bytes);
+    IOResult        seek(const std::size_t offset, const SeekOrigin origin = SeekOrigin::RELATIVE);
     IOResult        setFailureState(IOResult err);
 
     static IByteReader fromBuffer(const uint8_t* buffer, const size_t buffer_size);

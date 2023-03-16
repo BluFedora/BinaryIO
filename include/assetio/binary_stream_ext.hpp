@@ -20,6 +20,7 @@
 namespace assetio
 {
   ByteWriterView byteWriterViewFromVector(std::vector<uint8_t>* const buffer);
+  ByteWriterView byteWriterViewFromFile(std::FILE* const file_handle);
 
   class CFileBufferedByteReader : public IByteReader
   {

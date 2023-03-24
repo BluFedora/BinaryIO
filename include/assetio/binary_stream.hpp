@@ -101,7 +101,7 @@ namespace assetio
   enum class SeekOrigin
   {
     BEGIN,
-    RELATIVE,
+    CURRENT,
     END,
   };
 
@@ -128,7 +128,7 @@ namespace assetio
     inline size_t   bufferSize() const { return buffer_end - buffer_start; }
     inline size_t   numBytesAvailable() const { return buffer_end - cursor; }
     IOResult        read(void* const dst_bytes, const std::size_t num_bytes);
-    IOResult        seek(const std::size_t offset, const SeekOrigin origin = SeekOrigin::RELATIVE);
+    IOResult        seek(const std::size_t offset, const SeekOrigin origin = SeekOrigin::CURRENT);
     IOResult        setFailureState(IOResult err);
 
     static IByteReader fromBuffer(const uint8_t* buffer, const size_t buffer_size);

@@ -125,7 +125,7 @@ namespace assetio
         destination = buffer_start + offset;
         break;
       }
-      case SeekOrigin::RELATIVE:
+      case SeekOrigin::CURRENT:
       {
         destination = cursor + offset;
         break;
@@ -295,7 +295,7 @@ namespace assetio
         switch (origin)
         {
           case SeekOrigin::BEGIN: return SEEK_SET;
-          case SeekOrigin::RELATIVE: return SEEK_CUR;
+          case SeekOrigin::CURRENT: return SEEK_CUR;
           case SeekOrigin::END: return SEEK_END;
           default:
           {

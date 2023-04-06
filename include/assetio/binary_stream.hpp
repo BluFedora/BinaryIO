@@ -12,7 +12,7 @@
  *     [Small Writeup On Byte Order](https://commandcenter.blogspot.com/2012/04/byte-order-fallacy.html)
  *             [Int C Promotion FAQ](http://c-faq.com/expr/preservingrules.html)
  *
- * @copyright Copyright (c) 2021-2022
+ * @copyright Copyright (c) 2021-2023 Shareef Abdoul-Raheem
  */
 /******************************************************************************/
 #ifndef BINARY_STREAM_HPP
@@ -34,7 +34,7 @@ namespace assetio
    */
   enum class IOResult : std::uint32_t
   {
-    Success,            //!< No error occured.
+    Success,            //!< No error occurred.
     EndOfStream,        //!< No more data in stream.
     AllocationFailure,  //!< Failed to allocate memory for internal stream operations.
     ReadError,          //!< Failed to get more data from stream.
@@ -59,7 +59,7 @@ namespace assetio
      *   The number of bytes to write to stream.
      *
      * @return
-     *   `IOResult::Success` if no errors occured otherwise an error code is returned.
+     *   `IOResult::Success` if no errors occurred otherwise an error code is returned.
      */
     virtual IOResult write(const void* const bytes, const size_t num_bytes) = 0;
 
@@ -225,7 +225,7 @@ namespace assetio
 /*
   MIT License
 
-  Copyright (c) 2021-2022 Shareef Abdoul-Raheem
+  Copyright (c) 2021-2023 Shareef Abdoul-Raheem
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal

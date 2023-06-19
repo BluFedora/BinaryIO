@@ -61,33 +61,27 @@ inline static constexpr std::uint32_t k_Crc32Table[256] =
 // clang-format on
 
 // crc-32b
-inline constexpr std::uint32_t crc32(const char* bytes, std::size_t num_bytes)
+
+inline constexpr std::uint32_t crc32_begin()
 {
-  std::uint32_t crc = 0xFFFFFFFF;
+  return 0xFFFFFFFF;
+}
+
+inline constexpr void crc32_addBytes(std::uint32_t* in_out_crc, const char* bytes, std::size_t num_bytes)
+{
+  std::uint32_t crc = *in_out_crc;
 
   for (std::size_t i = 0; i < num_bytes; ++i)
   {
     crc = (crc >> 8) ^ k_Crc32Table[(bytes[i] ^ crc) & 0xFF];
   }
 
-  return ~crc;
+  *in_out_crc = crc;
 }
 
-inline constexpr std::uint32_t crc32(const char* bytes)
+inline constexpr void crc32_end(std::uint32_t* in_out_crc)
 {
-  std::uint32_t crc = 0xFFFFFFFF;
-
-  while (*bytes)
-  {
-    crc = (crc >> 8) ^ k_Crc32Table[(*bytes++ ^ crc) & 0xFF];
-  }
-
-  return ~crc;
-}
-
-inline constexpr std::uint32_t operator""_crc32(const char* s, std::size_t size)
-{
-  return crc32(s, size);
+  *in_out_crc = ~*in_out_crc;
 }
 
 namespace assetio
@@ -212,6 +206,7 @@ namespace assetio
   template<typename SubClass, VersionType k_Version, ChunkTypeID k_ChunkTypeID>
   struct BaseBinaryChunkHeader : public BinaryChunkHeader
   {
+    static constexpr VersionType       Version = k_Version;
     static constexpr BinaryChunkTypeID ChunkID = k_ChunkTypeID;
 
     using Base = BaseBinaryChunkHeader<SubClass, k_Version, k_ChunkTypeID>;
@@ -231,8 +226,6 @@ namespace assetio
     {
       return sizeof(SubClass) + data_size + sizeof(BinaryChunkFooter);
     }
-
-    void writeChecksum(BinaryChunkHeader* chunk_header);
   }  // namespace ChunkUtils
 
 #if __cplusplus >= 201703L

@@ -36,16 +36,6 @@ namespace assetio
     return expr;
   }
 
-  // binary_chunk.hpp
-
-  void ChunkUtils::writeChecksum(BinaryChunkHeader* chunk_header)
-  {
-    const char* const        data   = static_cast<const char*>(chunk_header->data());
-    BinaryChunkFooter* const footer = chunk_header->footer();
-
-    footer->crc32_checksum = crc32(data, chunk_header->data_size);
-  }
-
   // binary_stream.hpp
 
   //// ByteWriterView

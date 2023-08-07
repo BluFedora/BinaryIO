@@ -42,6 +42,16 @@ namespace assetio
     UnknownError,       //!< Unknown failure.
   };
 
+  inline IOResult& operator+=(IOResult& lhs, const IOResult rhs)
+  {
+    if (rhs != IOResult::Success)
+    {
+      lhs = rhs;
+    }
+
+    return lhs;
+  }
+
   /*!
    * @brief
    *   Interface for writing bytes.
@@ -117,12 +127,12 @@ namespace assetio
     using RefillFn = IOResult (*)(IByteReader* self);
     using SeekFn   = IOResult (*)(IByteReader* self, const std::size_t offset, const SeekOrigin origin);
 
-    const uint8_t*  buffer_start = nullptr;            //!< Start of buffer.
-    const uint8_t*  cursor       = nullptr;            //!< Invariant: buffer_start <= cursor <= buffer_end, user code sets this.
-    const uint8_t*  buffer_end   = nullptr;            //!< End of Buffer + 1, should not be read from.
-    IOResult        last_result  = IOResult::Success;  //!< Initialized to `IOResult::Success`.
-    RefillFn        refill_fn    = nullptr;            //!< Called when more data from the stream is needed.
-    SeekFn          seek_fn      = nullptr;            //!< Called when `IByteReader::seek` is called, if null then seek will work on the local buffer.
+    const uint8_t* buffer_start = nullptr;            //!< Start of buffer.
+    const uint8_t* cursor       = nullptr;            //!< Invariant: buffer_start <= cursor <= buffer_end, user code sets this.
+    const uint8_t* buffer_end   = nullptr;            //!< End of Buffer + 1, should not be read from.
+    IOResult       last_result  = IOResult::Success;  //!< Initialized to `IOResult::Success`.
+    RefillFn       refill_fn    = nullptr;            //!< Called when more data from the stream is needed.
+    SeekFn         seek_fn      = nullptr;            //!< Called when `IByteReader::seek` is called, if null then seek will work on the local buffer.
 
     inline IOResult refill() { return refill_fn(this); }
     inline size_t   bufferSize() const { return buffer_end - buffer_start; }

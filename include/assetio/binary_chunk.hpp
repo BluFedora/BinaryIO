@@ -217,6 +217,11 @@ namespace assetio
       static_assert(sizeof(Base) == sizeof(BinaryChunkHeader), "This helper should not add to the size of the header.");
       static_assert(std::is_base_of_v<Base, SubClass>, "CRTP, the template argument must be passed in.");
     }
+
+    BaseBinaryChunkHeader() :
+      BaseBinaryChunkHeader(0u)
+    {
+    }
   };
 
   namespace ChunkUtils

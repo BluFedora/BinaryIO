@@ -128,15 +128,17 @@ namespace assetio
       return 0;
     }
 
-    friend inline bool operator==(const rel_ptr& lhs, const rel_ptr& rhs)
-    {
-      return lhs.get() == rhs.get();
-    }
+    friend inline bool operator==(const rel_ptr& lhs, const rel_ptr& rhs) { return lhs.get() == rhs.get(); }
+    friend inline bool operator==(const rel_ptr& lhs, const T* const rhs) { return lhs.get() == rhs; }
+    friend inline bool operator==(const T* const lhs, const rel_ptr& rhs) { return lhs == rhs.get(); }
+    friend inline bool operator==(const rel_ptr& lhs, const std::nullptr_t) { return lhs.isNull(); }
+    friend inline bool operator==(const std::nullptr_t, const rel_ptr& rhs) { return rhs.isNull(); }
 
-    friend inline bool operator!=(const rel_ptr& lhs, const rel_ptr& rhs)
-    {
-      return lhs.get() != rhs.get();
-    }
+    friend inline bool operator!=(const rel_ptr& lhs, const rel_ptr& rhs) { return lhs.get() != rhs.get(); }
+    friend inline bool operator!=(const rel_ptr& lhs, const T* const rhs) { return lhs.get() != rhs; }
+    friend inline bool operator!=(const T* const lhs, const rel_ptr& rhs) { return lhs != rhs.get(); }
+    friend inline bool operator!=(const rel_ptr& lhs, const std::nullptr_t) { return !lhs.isNull(); }
+    friend inline bool operator!=(const std::nullptr_t, const rel_ptr& rhs) { return !rhs.isNull(); }
   };
 
   template<typename TCount, typename TPtr>

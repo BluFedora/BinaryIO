@@ -157,12 +157,11 @@ namespace assetio
 
   //
   // Base header for binary chunks.
-  // Increasing the header size allows for additional information to be stored.
   //
   struct BinaryChunkHeader
   {
     BinaryChunkTypeID type_id;      //!< The chunk's type.
-    VersionType       version;      //!< Version number starting at 0.
+    VersionType       version;      //!< Version number.
     std::uint16_t     header_size;  //!< Number of bytes to skip from the beginning of this header to get to the data.
     std::uint64_t     data_size;    //!< Size in bytes of the chunk's data.
 

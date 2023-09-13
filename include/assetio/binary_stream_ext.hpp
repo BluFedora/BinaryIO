@@ -6,7 +6,7 @@
  * @brief
  *   Helpers for standard types for the binary stream interface.
  *
- * @copyright Copyright (c) 2022
+ * @copyright Copyright (c) 2022-2023
  */
 /******************************************************************************/
 #ifndef BINARY_STREAM_EXT_HPP
@@ -29,7 +29,7 @@ namespace assetio
     std::uint8_t     m_LocalBuffer[BUFSIZ];
 
    public:
-    CFileBufferedByteReader(FILE* const file);
+    CFileBufferedByteReader(FILE* const file_handle);
   };
 }  // namespace assetio
 
@@ -39,7 +39,7 @@ namespace assetio
 /*
   MIT License
 
-  Copyright (c) 2022 Shareef Abdoul-Raheem
+  Copyright (c) 2022-2023 Shareef Abdoul-Raheem
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal

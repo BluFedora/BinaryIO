@@ -6,7 +6,7 @@
  * @brief
  *   Implementation of any code that doesnt belong in the header.
  *
- * @copyright Copyright (c) 2022
+ * @copyright Copyright (c) 2022-2023
  */
 /******************************************************************************/
 #include "assetio/binary_assert.hpp"
@@ -70,10 +70,11 @@ namespace assetio
 
   //// IByteReader
 
-  IOResult IByteReader::read(void* const dst_bytes, const std::size_t num_bytes)
+  IOResult IByteReader::read(void* const dst_bytes, const std::size_t num_bytes, std::size_t* const out_num_bytes_written)
   {
-    char*             write_cursor = static_cast<char*>(dst_bytes);
-    const char* const write_end    = write_cursor + num_bytes;
+    unsigned char* const       write_bgn    = static_cast<unsigned char*>(dst_bytes);
+    const unsigned char* const write_end    = write_bgn + num_bytes;
+    unsigned char*             write_cursor = write_bgn;
 
     while (write_cursor != write_end)
     {
@@ -95,6 +96,11 @@ namespace assetio
 
       write_cursor += num_bytes_able_to_read;
       cursor += num_bytes_able_to_read;
+    }
+
+    if (out_num_bytes_written)
+    {
+      *out_num_bytes_written = write_cursor - write_bgn;
     }
 
     return last_result;
@@ -211,6 +217,8 @@ namespace assetio
 
   ByteWriterView byteWriterViewFromFile(std::FILE* const file_handle)
   {
+    binaryIOAssert(file_handle != nullptr, "Invalid file handle.");
+
     return ByteWriterView{
      [](void* user_data, const void* bytes, size_t num_bytes) -> IOResult {
        std::FILE* const file = static_cast<std::FILE*>(user_data);
@@ -231,12 +239,12 @@ namespace assetio
 
   //// CFileBufferedByteReader
 
-  CFileBufferedByteReader::CFileBufferedByteReader(FILE* const file) :
+  CFileBufferedByteReader::CFileBufferedByteReader(FILE* const file_handle) :
     IByteReader(),
-    m_FileHandle{file},
+    m_FileHandle{file_handle},
     m_LocalBuffer{}
   {
-    binaryIOAssert(file != nullptr, "Invalid file handle.");
+    binaryIOAssert(file_handle != nullptr, "Invalid file handle.");
 
     buffer_start = m_LocalBuffer;
     cursor       = m_LocalBuffer;
@@ -318,7 +326,7 @@ namespace assetio
 /*
   MIT License
 
-  Copyright (c) 2022 Shareef Abdoul-Raheem
+  Copyright (c) 2022-2023 Shareef Abdoul-Raheem
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal

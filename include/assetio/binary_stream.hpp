@@ -39,6 +39,7 @@ namespace assetio
     AllocationFailure,  //!< Failed to allocate memory for internal stream operations.
     ReadError,          //!< Failed to get more data from stream.
     SeekError,          //!< Invalid seek location.
+    InvalidData,        //!< Parse error.
     UnknownError,       //!< Unknown failure.
   };
 
@@ -137,7 +138,7 @@ namespace assetio
     inline IOResult refill() { return refill_fn(this); }
     inline size_t   bufferSize() const { return buffer_end - buffer_start; }
     inline size_t   numBytesAvailable() const { return buffer_end - cursor; }
-    IOResult        read(void* const dst_bytes, const std::size_t num_bytes);
+    IOResult        read(void* const dst_bytes, const std::size_t num_bytes, std::size_t* const out_num_bytes_written = nullptr);
     IOResult        seek(const std::size_t offset, const SeekOrigin origin = SeekOrigin::CURRENT);
     IOResult        setFailureState(IOResult err);
 
@@ -155,8 +156,7 @@ namespace assetio
     {
       static_assert(std::is_integral_v<T>, "Byte ordering is for integral types.");
 
-      alignas(T) std::uint8_t bytes[sizeof(T)];
-
+      std::uint8_t bytes[sizeof(T)];
       for (std::size_t i = 0u; i < sizeof(T); ++i)
       {
         bytes[convertIndex(i)] = (value >> (i * CHAR_BIT)) & 0xFF;

@@ -148,8 +148,8 @@ namespace assetio
     using offset_type    = typename TPtr::offset_type;
     using value_type     = typename TPtr::value_type;
 
-    TPtr   elements     = nullptr;
     TCount num_elements = 0u;
+    TPtr   elements     = nullptr;
 
     auto& operator[](const std::size_t idx) const { return elements.get()[idx]; }
 

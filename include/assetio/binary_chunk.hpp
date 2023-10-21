@@ -67,13 +67,13 @@ inline constexpr std::uint32_t crc32_begin()
   return 0xFFFFFFFF;
 }
 
-inline constexpr void crc32_addBytes(std::uint32_t* in_out_crc, const char* bytes, std::size_t num_bytes)
+inline constexpr void crc32_addBytes(std::uint32_t* in_out_crc, const void* bytes, std::size_t num_bytes)
 {
   std::uint32_t crc = *in_out_crc;
 
   for (std::size_t i = 0; i < num_bytes; ++i)
   {
-    crc = (crc >> 8) ^ k_Crc32Table[(bytes[i] ^ crc) & 0xFF];
+    crc = (crc >> 8) ^ k_Crc32Table[(static_cast<const char*>(bytes)[i] ^ crc) & 0xFF];
   }
 
   *in_out_crc = crc;
@@ -151,7 +151,7 @@ namespace assetio
 
   struct BinaryChunkFooter
   {
-    std::uint32_t crc32_checksum;  //!< Checksum of the data from the crc32 algorithm.
+    std::uint32_t crc32_checksum;  //!< Checksum of the data using the crc32 algorithm.
   };
   static_assert(sizeof(BinaryChunkFooter) == sizeof(std::uint32_t), "");
 

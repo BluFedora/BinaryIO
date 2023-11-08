@@ -1,14 +1,9 @@
-################################################################################
-#                                                                              #
-#                            BF BINARY IO PROJECT                              #
-#                                                                              #
-################################################################################
-###     Abstract interface for Binary IO Operations For C++11 and above.     ###
-################################################################################
-
+# 
+# BinaryIO by Shareef Raheem (@blufedora)
+#
 cmake_minimum_required(VERSION 3.23)
 
-project(AssetIO_BinaryIO)
+project(AssetIO_BinaryIO VERSION 1.0.0 DESCRIPTION "Helper Binary IO Operations For C++17 and above." LANGUAGES CXX)
 
 add_library(
   AssetIO_BinaryIO STATIC
@@ -17,6 +12,7 @@ add_library(
       "include/assetio/binary_assert.hpp"
       "include/assetio/binary_stream.hpp"
       "include/assetio/binary_stream_ext.hpp"
+      "include/assetio/byte_swap.hpp"
       "include/assetio/rel_ptr.hpp"
 
     # Sources

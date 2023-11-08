@@ -6,13 +6,14 @@
  * @brief
  *   Implementation of any code that doesnt belong in the header.
  *
- * @copyright Copyright (c) 2022-2023
+ * @copyright Copyright (c) 2022-2023 Shareef Abdoul-Raheem
  */
 /******************************************************************************/
 #include "assetio/binary_assert.hpp"
 #include "assetio/binary_chunk.hpp"
 #include "assetio/binary_stream.hpp"
 #include "assetio/binary_stream_ext.hpp"
+#include "assetio/byte_swap.hpp"
 
 #include <algorithm>  // rotate
 #include <cstdio>     // fprintf, stderr

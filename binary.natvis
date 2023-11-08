@@ -19,7 +19,7 @@
 
   <Type Name="assetio::rel_array&lt;*, *&gt;">
     <DisplayString>{{ num_elements={num_elements} }}</DisplayString>
-    
+
     <Expand>
       <Item Name="[num_elements]">num_elements</Item>
       <ArrayItems>

@@ -4,8 +4,8 @@
 ![Linux Build Badge](https://github.com/BluFedora/BinaryIO/actions/workflows/build_linux.yml/badge.svg)
 ![macOS Build Badge](https://github.com/BluFedora/BinaryIO/actions/workflows/build_macos.yml/badge.svg)
 
-BinaryIO is a small base C++ library for a unified binary stream interface with
-some helpers for easily implementing custom binary file formats.
+BinaryIO is a small C++ library for a unified binary stream interface
+with some helpers for easily implementing custom binary file formats.
 
 [assetio/binary_assert.hpp](include/assetio/binary_assert.hpp): Contains the `binaryIOAssert` assertion macro.
 
@@ -27,6 +27,12 @@ some helpers for easily implementing custom binary file formats.
 
 - `byteWriterViewFromVector` : Function for creating a buffer view from a standard vector.
 - `CFileBufferedByteReader`  : C File IByteReader implementation.
+
+[assetio/byte_swap.hpp](include/assetio/byte_swap.hpp): Contains functions for swapping bytes of 16, 32 and 64bit unsigned integers.
+
+- `byteSwap16`, `byteSwap32`, `byteSwap64`: Swaps the bytes of the specified bit width integer.
+  - There are overloads of these functions that take in the value as a template parameter for constexpr evaluation.
+- `byteSwap16_portable`, `byteSwap32_portable`, `byteSwap64_portable`: Reference implementations not using intrinsics.
 
 [assetio/rel_ptr.hpp](include/assetio/rel_ptr.hpp): Contains a pointer type that stores the relative offset from itself to the pointed object for making memory mappable binary file formats.
 

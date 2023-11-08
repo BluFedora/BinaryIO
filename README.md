@@ -17,7 +17,6 @@ with some helpers for easily implementing custom binary file formats.
 - `IByteWriter`    : Interface for writing to a binary stream.
 - `ByteWriterView` : Non-owning IByteWriter adaptor.
 - `IByteReader`    : Interface for reading a binary stream.
-- `swapEndian`     : Function for swapping endianness of an integer.
 - `writeLE`        : Function for writing an integer in little endian format.
 - `writeBE`        : Function for writing an integer in big endian format.
 - `readLE`         : Function for reading an integer in little endian format.

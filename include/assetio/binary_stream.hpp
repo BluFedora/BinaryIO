@@ -188,23 +188,6 @@ namespace assetio
   }  // namespace detail
 
   template<typename T>
-  T swapEndian(const T value) noexcept
-  {
-    static_assert(std::is_integral_v<T>, "Byte ordering is for integral types.");
-
-    T                         result;
-    const std::uint8_t* const src = reinterpret_cast<const std::uint8_t*>(&value);
-    std::uint8_t* const       dst = reinterpret_cast<std::uint8_t*>(&result);
-
-    for (std::size_t i = 0; i < sizeof(T); ++i)
-    {
-      dst[i] = src[sizeof(T) - i - 1];
-    }
-
-    return result;
-  }
-
-  template<typename T>
   IOResult writeLE(IByteWriter& writer, const T value) noexcept
   {
     return detail::writeXEndian(writer, value, [](const std::size_t i) { return i; });

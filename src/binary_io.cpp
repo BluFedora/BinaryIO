@@ -238,6 +238,24 @@ namespace assetio
      file_handle};
   }
 
+  ByteWriterView byteWriterViewFromBuffer(Buffer* const buffer)
+  {
+    return ByteWriterView{
+     [](void* user_data, const void* bytes, size_t num_bytes) -> IOResult {
+       Buffer* const buffer = static_cast<Buffer*>(user_data);
+
+       if ((buffer->written + num_bytes) <= buffer->capacity)
+       {
+         std::memcpy(static_cast<unsigned char*>(buffer->ptr) + buffer->written, bytes, num_bytes);
+         buffer->written += num_bytes;
+         return IOResult::Success;
+       }
+
+       return IOResult::EndOfStream;
+     },
+     buffer};
+  }
+
   //// CFileBufferedByteReader
 
   CFileBufferedByteReader::CFileBufferedByteReader(FILE* const file_handle) :

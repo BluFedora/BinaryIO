@@ -19,8 +19,23 @@
 
 namespace assetio
 {
+  struct Buffer
+  {
+    void*       ptr;
+    std::size_t written;
+    std::size_t capacity;
+
+    Buffer(void* const ptr, std::size_t capacity) :
+      ptr{ptr},
+      written{0},
+      capacity{capacity}
+    {
+    }
+  };
+
   ByteWriterView byteWriterViewFromVector(std::vector<uint8_t>* const buffer);
   ByteWriterView byteWriterViewFromFile(std::FILE* const file_handle);
+  ByteWriterView byteWriterViewFromBuffer(Buffer* const buffer);
 
   class CFileBufferedByteReader : public IByteReader
   {

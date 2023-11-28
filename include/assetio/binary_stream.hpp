@@ -151,36 +151,58 @@ namespace assetio
 
   namespace detail
   {
+    template<typename T, bool is_enum>
+    struct UnderlyingTypeImpl;
+
+    template<typename T>
+    struct UnderlyingTypeImpl<T, true>
+    {
+      using type = std::underlying_type_t<T>;
+    };
+
+    template<typename T>
+    struct UnderlyingTypeImpl<T, false>
+    {
+      using type = T;
+    };
+
+    template<typename T>
+    using UnderlyingType = typename UnderlyingTypeImpl<T, std::is_enum_v<T>>::type;
+
     template<typename T, typename F>
     IOResult writeXEndian(IByteWriter& writer, const T value, F&& convertIndex) noexcept
     {
-      static_assert(std::is_integral_v<T>, "Byte ordering is for integral types.");
+      static_assert(std::is_integral_v<T> || std::is_enum_v<T>, "Byte ordering is for integral types.");
 
       std::uint8_t bytes[sizeof(T)];
       for (std::size_t i = 0u; i < sizeof(T); ++i)
       {
-        bytes[convertIndex(i)] = (value >> (i * CHAR_BIT)) & 0xFF;
+        bytes[convertIndex(i)] = (static_cast<UnderlyingType<T>>(value) >> (i * CHAR_BIT)) & 0xFF;
       }
 
       return writer.write(bytes, sizeof(bytes));
     }
 
     template<typename T, typename F>
-    IOResult readXEndian(IByteReader& reader, T* value, F&& convertIndex) noexcept
+    IOResult readXEndian(IByteReader& reader, T* out_value, F&& convertIndex) noexcept
     {
-      static_assert(std::is_integral_v<T>, "Byte ordering is for integral types.");
+      static_assert(std::is_integral_v<T> || std::is_enum_v<T>, "Byte ordering is for integral types.");
 
       std::uint8_t   bytes[sizeof(T)];
       const IOResult result = reader.read(bytes, sizeof(bytes));
 
       if (result == IOResult::Success)
       {
-        *value = 0x0;
+        using UT = UnderlyingType<T>;
+
+        UT value = 0x0;
 
         for (std::size_t i = 0u; i < sizeof(T); ++i)
         {
-          (*value) |= T(T(bytes[convertIndex(i)]) << (i * CHAR_BIT));
+          value |= UT(UT(bytes[convertIndex(i)]) << (i * CHAR_BIT));
         }
+
+        *out_value = static_cast<T>(value);
       }
 
       return result;

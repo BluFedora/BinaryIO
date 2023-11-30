@@ -18,9 +18,10 @@
 #ifndef BINARY_STREAM_HPP
 #define BINARY_STREAM_HPP
 
-#include <climits>  // CHAR_BIT
-#include <cstddef>  // size_t
-#include <cstdint>  // uint32_t, uint8_t
+#include <climits>      // CHAR_BIT
+#include <cstddef>      // size_t
+#include <cstdint>      // uint32_t, uint8_t
+#include <type_traits>  // underlying_type_t, is_enum_v, is_integral_v
 
 namespace assetio
 {

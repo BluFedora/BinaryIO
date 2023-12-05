@@ -210,16 +210,11 @@ namespace assetio
 
     using Base = BaseBinaryChunkHeader<SubClass, k_Version, k_ChunkTypeID>;
 
-    explicit BaseBinaryChunkHeader(const std::uint64_t data_size) :
-      BinaryChunkHeader(ChunkID, k_Version, data_size, sizeof(SubClass))
+    BaseBinaryChunkHeader() :
+      BinaryChunkHeader(ChunkID, k_Version, 0u, sizeof(SubClass))
     {
       static_assert(sizeof(Base) == sizeof(BinaryChunkHeader), "This helper should not add to the size of the header.");
       static_assert(std::is_base_of_v<Base, SubClass>, "CRTP, the template argument must be passed in.");
-    }
-
-    BaseBinaryChunkHeader() :
-      BaseBinaryChunkHeader(0u)
-    {
     }
   };
 

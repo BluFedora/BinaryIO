@@ -33,7 +33,41 @@ namespace assetio
     }
   };
 
-  ByteWriterView byteWriterViewFromVector(std::vector<uint8_t>* const buffer);
+  template<typename Allocator>
+  inline ByteWriterView byteWriterViewFromVector(std::vector<uint8_t, Allocator>* const buffer)
+  {
+    return ByteWriterView(
+     [](void* user_data, const void* bytes, size_t num_bytes) -> IOResult {
+       try
+       {
+         std::vector<uint8_t, Allocator>* const buffer           = static_cast<std::vector<uint8_t, Allocator>*>(user_data);
+         const bool                             is_end_of_stream = bytes == nullptr && num_bytes == 0u;
+
+         if (!is_end_of_stream)
+         {
+           const uint8_t* const typed_bytes = static_cast<const uint8_t*>(bytes);
+
+           buffer->insert(buffer->end(), typed_bytes, typed_bytes + num_bytes);
+         }
+         else
+         {
+           // End of Stream, No work needed for Vector.
+         }
+
+         return IOResult::Success;
+       }
+       catch (const std::bad_alloc&)
+       {
+         return IOResult::AllocationFailure;
+       }
+       catch (...)
+       {
+         return IOResult::UnknownError;
+       }
+     },
+     buffer);
+  }
+
   ByteWriterView byteWriterViewFromFile(std::FILE* const file_handle);
   ByteWriterView byteWriterViewFromBuffer(Buffer* const buffer);
 

@@ -2,11 +2,11 @@
 /*!
  * @file   byte_swap.hpp
  * @author Shareef Raheem (https://blufedora.github.io)
- * @date   2022-06-11
  * @brief
- *   Intinsics for fast byte swapping routines.
+ *   Intinsics for fast byte swapping routines, should just compile down to a
+ *   `bswap` instuction on x86, or a `rev` / `rev16` instuction on arm.
  *
- * @copyright Copyright (c) 2023 Shareef Abdoul-Raheem
+ * @copyright Copyright (c) 2023-2024 Shareef Abdoul-Raheem
  */
 /******************************************************************************/
 #ifndef LIB_ASSETIO_BINARYIO_BYTE_SWAP_HPP
@@ -22,99 +22,123 @@ namespace binaryio
 {
   // Portable implementations of byte swap
 
-  inline constexpr std::uint16_t byteSwap16_portable(const std::uint16_t value)
+  namespace detail
   {
-    return ((value & 0x00FF) << 8) |
-           ((value & 0xFF00) >> 8);
-  }
+    constexpr std::uint16_t byteSwap16_portable(const std::uint16_t value)
+    {
+      return ((value & 0x00FF) << 8) |
+             ((value & 0xFF00) >> 8);
+    }
 
-  inline constexpr std::uint32_t byteSwap32_portable(const std::uint32_t value)
-  {
-    return ((value & 0x000000FF) << 24) |
-           ((value & 0x0000FF00) << 8) |
-           ((value & 0x00FF0000) >> 8) |
-           ((value & 0xFF000000) >> 24);
-  }
+    constexpr std::uint32_t byteSwap32_portable(const std::uint32_t value)
+    {
+      return ((value & 0x000000FF) << 24) |
+             ((value & 0x0000FF00) << 8) |
+             ((value & 0x00FF0000) >> 8) |
+             ((value & 0xFF000000) >> 24);
+    }
 
-  inline constexpr std::uint64_t byteSwap64_portable(const std::uint64_t value)
-  {
-    return ((value & 0x00000000000000FF) << 56) |
-           ((value & 0x000000000000FF00) << 40) |
-           ((value & 0x0000000000FF0000) << 24) |
-           ((value & 0x00000000FF000000) << 8) |
-           ((value & 0x000000FF00000000) >> 8) |
-           ((value & 0x0000FF0000000000) >> 24) |
-           ((value & 0x00FF000000000000) >> 40) |
-           ((value & 0xFF00000000000000) >> 56);
-  }
+    constexpr std::uint64_t byteSwap64_portable(const std::uint64_t value)
+    {
+      return ((value & 0x00000000000000FF) << 56) |
+             ((value & 0x000000000000FF00) << 40) |
+             ((value & 0x0000000000FF0000) << 24) |
+             ((value & 0x00000000FF000000) << 8) |
+             ((value & 0x000000FF00000000) >> 8) |
+             ((value & 0x0000FF0000000000) >> 24) |
+             ((value & 0x00FF000000000000) >> 40) |
+             ((value & 0xFF00000000000000) >> 56);
+    }
+  }  // namespace detail
 
   // Intrinsic verions of the byte swap functions
 
 #if defined(__GNUC__) || defined(__clang__) || defined(__INTEL_LLVM_COMPILER)  // gcc or clang or intel
-  inline constexpr std::uint16_t byteSwap16(const std::uint16_t value)
+  constexpr std::uint16_t byteSwap16(const std::uint16_t value)
   {
     return __builtin_bswap16(value);
   }
 
-  inline constexpr std::uint32_t byteSwap32(const std::uint32_t value)
+  constexpr std::uint32_t byteSwap32(const std::uint32_t value)
   {
     return __builtin_bswap32(value);
   }
 
-  inline constexpr std::uint64_t byteSwap64(const std::uint64_t value)
+  constexpr std::uint64_t byteSwap64(const std::uint64_t value)
   {
     return __builtin_bswap64(value);
   }
 #elif defined(_MSC_VER)  // msvc
   inline std::uint16_t byteSwap16(const std::uint16_t value)
   {
-    return _byteswap_ushort(value);
+    if constexpr (sizeof(unsigned short) == sizeof(value))
+    {
+      return _byteswap_ushort(value);
+    }
+    else
+    {
+      return detail::byteSwap16_portable(value);
+    }
   }
 
   inline std::uint32_t byteSwap32(const std::uint32_t value)
   {
-    return _byteswap_ulong(value);
+    if constexpr (sizeof(unsigned long) == sizeof(value))
+    {
+      return _byteswap_ulong(value);
+    }
+    else
+    {
+      return detail::byteSwap16_portable(value);
+    }
   }
 
   inline std::uint64_t byteSwap64(const std::uint64_t value)
   {
-    return _byteswap_uint64(value);
+    if constexpr (sizeof(unsigned __int64) == sizeof(value))
+    {
+      return _byteswap_uint64(value);
+    }
+    else
+    {
+      return detail::byteSwap16_portable(value);
+    }
   }
 #else
-  inline constexpr std::uint16_t byteSwap16(const std::uint16_t value)
+  constexpr std::uint16_t byteSwap16(const std::uint16_t value)
   {
-    return byteSwap16_portable(value);
+    return detail::byteSwap16_portable(value);
   }
 
-  inline constexpr std::uint32_t byteSwap32(const std::uint32_t value)
+  constexpr std::uint32_t byteSwap32(const std::uint32_t value)
   {
-    return byteSwap32_portable(value);
+    return detail::byteSwap32_portable(value);
   }
 
-  inline constexpr std::uint64_t byteSwap64(const std::uint64_t value)
+  constexpr std::uint64_t byteSwap64(const std::uint64_t value)
   {
-    return byteSwap64_portable(value);
+    return detail::byteSwap64_portable(value);
   }
 #endif
 
   // Constexpr versions (only needed on msvc since their intrinsics are not marked constexpr.)
 
   template<std::uint16_t value>
-  inline constexpr std::uint16_t byteSwap16()
+  constexpr std::uint16_t byteSwap16()
   {
-    return byteSwap16_portable(value);
+    return detail::byteSwap16_portable(value);
   }
 
   template<std::uint32_t value>
-  inline constexpr std::uint32_t byteSwap32()
+  constexpr std::uint32_t byteSwap32()
   {
-    return byteSwap32_portable(value);
+    return detail::byteSwap32_portable(value);
   }
 
   template<std::uint64_t value>
-  inline constexpr std::uint64_t byteSwap64()
+  constexpr std::uint64_t byteSwap64()
   {
-    return byteSwap64_portable(value);
+    return detail::byteSwap64_portable(value);
   }
 }  // namespace binaryio
 
@@ -124,7 +148,7 @@ namespace binaryio
 /*
   MIT License
 
-  Copyright (c) 2023 Shareef Abdoul-Raheem
+  Copyright (c) 2023-2024 Shareef Abdoul-Raheem
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal

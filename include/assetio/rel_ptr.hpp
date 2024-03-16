@@ -2,14 +2,13 @@
 /*!
  * @file   rel_ptr.hpp
  * @author Shareef Raheem (https://blufedora.github.io)
- * @date   2021-09-19
  * @brief
  *   A pointer type that uses a relative signed offset from it's own address.
  *
  *   References:
  *     [https://steamcdn-a.akamaihd.net/apps/valve/2015/Migdalskiy_Sergiy_Physics_Optimization_Strategies.pdf]
  *
- * @copyright Copyright (c) 2021-2022 Shareef Abdoul-Raheem
+ * @copyright Copyright (c) 2021-2024 Shareef Abdoul-Raheem
  */
 /******************************************************************************/
 #ifndef REL_PTR_HPP
@@ -17,7 +16,6 @@
 
 #include "binary_assert.hpp"  // binaryIOAssert
 
-#include <climits>      // CHAR_BIT
 #include <cstdint>      // int8_t, int16_t, int32_t int64_t, uint8_t, uint16_t, uint32_t uint64_t
 #include <limits>       // numeric_limits
 #include <type_traits>  // is_integral_v, is_unsigned_v
@@ -27,16 +25,20 @@ namespace assetio
   /*!
    * @brief
    *   A pointer type that uses a relative signed offset from it's own address.
+   *   This allows the pointer to be dumped to disk without an extra deserialization step.
    *
    * @tparam offset_type
    *   Controls the size of this pointer type.
    *
    * @tparam T
-   *   Datatype that this pointer points to.
+   *   Datatype that this pointer refers to.
    *
    * @tparam alignment_type
    *   If you know the min alignment of all uses of the type pointer to by offset
    *   you can increase the range by using larger strides.
+   *
+   * @warning
+   *   When copying / moving this type be sure to update the `rel_ptr::offset` accordingly.
    */
   template<typename offset_type_t, typename T, typename alignment_type_t = std::uint8_t>
   struct rel_ptr
@@ -50,7 +52,7 @@ namespace assetio
 
     static constexpr offset_type    k_OffsetMax          = std::numeric_limits<offset_type>::max();
     static constexpr offset_type    k_OffsetMin          = std::numeric_limits<offset_type>::min();
-    static constexpr alignment_type k_AlignmentByteCount = std::numeric_limits<alignment_type>::digits / CHAR_BIT;
+    static constexpr alignment_type k_AlignmentByteCount = sizeof(alignment_type);
 
     offset_type offset = 0;  //!< The stored offset from the address of `this`.
 
@@ -65,11 +67,6 @@ namespace assetio
       offset{calculateOffset(rhs, base())}
     {
     }
-
-    //
-    // Default Copy / Move behavior is in place to allow the type act trivially (for serialization purposes).
-    // but this behavior is undesireable since the offset will not be updated.
-    //
 
     rel_ptr(const rel_ptr& rhs)            = default;
     rel_ptr(rel_ptr&& rhs)                 = default;
@@ -144,6 +141,8 @@ namespace assetio
   template<typename TCount, typename TPtr>
   struct rel_array
   {
+    static_assert(std::is_integral_v<TCount> && std::is_unsigned_v<TCount>, "TCount must be an unsigned integer type.");
+
     using alignment_type = typename TPtr::alignment_type;
     using offset_type    = typename TPtr::offset_type;
     using value_type     = typename TPtr::value_type;
@@ -151,12 +150,12 @@ namespace assetio
     TCount num_elements = 0u;
     TPtr   elements     = nullptr;
 
-    auto& operator[](const std::size_t idx) const { return elements.get()[idx]; }
+    value_type& operator[](const std::size_t idx) const { return elements.get()[idx]; }
 
-    auto begin() { return elements.get(); }
-    auto end() { return begin() + num_elements; }
-    auto begin() const { return elements.get(); }
-    auto end() const { return begin() + num_elements; }
+    value_type*       begin() { return elements.get(); }
+    value_type*       end() { return begin() + num_elements; }
+    const value_type* begin() const { return elements.get(); }
+    const value_type* end() const { return begin() + num_elements; }
 
     bool isEmpty() const { return num_elements == 0u; }
   };
@@ -193,7 +192,7 @@ namespace assetio
 /*
   MIT License
 
-  Copyright (c) 2021-2022 Shareef Abdoul-Raheem
+  Copyright (c) 2021-2024 Shareef Abdoul-Raheem
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal

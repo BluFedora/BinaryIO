@@ -172,17 +172,17 @@ namespace assetio
   template<typename T, typename alignment_type = std::uint8_t>
   using rel_ptr64 = rel_ptr<std::int64_t, T, alignment_type>;
 
-  template<typename T>
-  using rel_array8 = rel_array<std::uint8_t, rel_ptr8<T>>;
+  template<typename T, typename alignment_type = std::uint8_t>
+  using rel_array8 = rel_array<std::uint8_t, rel_ptr8<T, alignment_type>>;
 
-  template<typename T>
-  using rel_array16 = rel_array<std::uint16_t, rel_ptr16<T>>;
+  template<typename T, typename alignment_type = std::uint8_t>
+  using rel_array16 = rel_array<std::uint16_t, rel_ptr16<T, alignment_type>>;
 
-  template<typename T>
-  using rel_array32 = rel_array<std::uint32_t, rel_ptr32<T>>;
+  template<typename T, typename alignment_type = std::uint8_t>
+  using rel_array32 = rel_array<std::uint32_t, rel_ptr32<T, alignment_type>>;
 
-  template<typename T>
-  using rel_array64 = rel_array<std::uint64_t, rel_ptr64<T>>;
+  template<typename T, typename alignment_type = std::uint8_t>
+  using rel_array64 = rel_array<std::uint64_t, rel_ptr64<T, alignment_type>>;
 
 }  // namespace assetio
 

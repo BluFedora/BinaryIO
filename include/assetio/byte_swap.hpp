@@ -89,7 +89,7 @@ namespace binaryio
     }
     else
     {
-      return detail::byteSwap16_portable(value);
+      return detail::byteSwap32_portable(value);
     }
   }
 
@@ -101,7 +101,7 @@ namespace binaryio
     }
     else
     {
-      return detail::byteSwap16_portable(value);
+      return detail::byteSwap64_portable(value);
     }
   }
 #else

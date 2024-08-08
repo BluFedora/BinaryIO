@@ -33,28 +33,26 @@ namespace assetio
    * @tparam T
    *   Datatype that this pointer refers to.
    *
-   * @tparam alignment_type
+   * @tparam alignment
    *   If you know the min alignment of all uses of the type pointer to by offset
    *   you can increase the range by using larger strides.
    *
    * @warning
    *   When copying / moving this type be sure to update the `rel_ptr::offset` accordingly.
    */
-  template<typename offset_type_t, typename T, typename alignment_type_t = std::uint8_t>
+  template<typename offset_type_t, typename T, std::uint8_t alignment = 1>
   struct rel_ptr
   {
-    using value_type     = T;
-    using offset_type    = offset_type_t;
-    using alignment_type = alignment_type_t;
+    using value_type  = T;
+    using offset_type = offset_type_t;
 
     static_assert(std::is_integral_v<offset_type> && !std::is_unsigned_v<offset_type>, "offset_type must be a signed integer type.");
-    static_assert(std::is_integral_v<alignment_type> && std::is_unsigned_v<alignment_type>, "alignment_type must be an unsigned integer type.");
+    static_assert(alignment > 0, "alignment must be an greater than 0.");
 
-    static constexpr offset_type    k_OffsetMax          = std::numeric_limits<offset_type>::max();
-    static constexpr offset_type    k_OffsetMin          = std::numeric_limits<offset_type>::min();
-    static constexpr alignment_type k_AlignmentByteCount = sizeof(alignment_type);
+    static constexpr offset_type k_OffsetMax = std::numeric_limits<offset_type>::max();
+    static constexpr offset_type k_OffsetMin = std::numeric_limits<offset_type>::min();
 
-    offset_type offset = 0;  //!< The stored offset from the address of `this`.
+    alignas(alignment) offset_type offset = 0;  //!< The stored offset from the address of `this`.
 
     rel_ptr() = default;
 
@@ -81,8 +79,11 @@ namespace assetio
     // Pointer Operators //
 
     T* operator->() const { return get(); }
+
+#if 0 // NOTE(SR): Does not work with rel_ptr<void>, disabled for now...
     T& operator*() const { return *get(); }
     T& operator[](const std::size_t idx) const { return get()[idx]; }
+#endif
 
     // Conversion Operators //
 
@@ -91,11 +92,11 @@ namespace assetio
 
     // Misc //
 
-    void            assign(T* const rhs) { offset = calculateOffset(rhs, base()); }
-    void            assign(std::nullptr_t) { offset = 0; }
-    bool            isNull() const { return offset == 0; }
-    T*              get() const { return isNull() ? nullptr : reinterpret_cast<T*>(base() + offset); }
-    alignment_type* base() const { return reinterpret_cast<alignment_type*>(const_cast<offset_type*>(&offset)); }
+    void     assign(T* const rhs) { offset = calculateOffset(rhs, base()); }
+    void     assign(std::nullptr_t) { offset = 0; }
+    bool     isNull() const { return offset == 0; }
+    T*       get() const { return isNull() ? nullptr : reinterpret_cast<T*>(base() + (offset * alignment)); }
+    uint8_t* base() const { return reinterpret_cast<uint8_t*>(const_cast<offset_type*>(&offset)); }
 
     /*!
      * @brief
@@ -110,16 +111,16 @@ namespace assetio
      * @return
      *   The offset from the pointer to the base address.
      */
-    static offset_type calculateOffset(T* const rhs, const alignment_type* base)
+    static offset_type calculateOffset(T* const rhs, const uint8_t* base)
     {
       if (rhs)
       {
-        const std::ptrdiff_t off = reinterpret_cast<const alignment_type*>(rhs) - base;
+        const std::ptrdiff_t off = (reinterpret_cast<const uint8_t*>(rhs) - base);
 
-        binaryIOAssert(reinterpret_cast<std::uintptr_t>(rhs) % k_AlignmentByteCount == 0, "Invalid pointer alignment, decrease alignment_type.");
+        binaryIOAssert((static_cast<std::uintptr_t>(off) % alignment) == 0, "Invalid pointer alignment, decrease alignment.");
         binaryIOAssert(off >= k_OffsetMin && off <= k_OffsetMax, "Pointer out of range, increase offset_type.");
 
-        return static_cast<offset_type>(off);
+        return static_cast<offset_type>(off / alignment);
       }
 
       return 0;
@@ -143,9 +144,8 @@ namespace assetio
   {
     static_assert(std::is_integral_v<TCount> && std::is_unsigned_v<TCount>, "TCount must be an unsigned integer type.");
 
-    using alignment_type = typename TPtr::alignment_type;
-    using offset_type    = typename TPtr::offset_type;
-    using value_type     = typename TPtr::value_type;
+    using offset_type = typename TPtr::offset_type;
+    using value_type  = typename TPtr::value_type;
 
     TCount num_elements = 0u;
     TPtr   elements     = nullptr;
@@ -160,29 +160,29 @@ namespace assetio
     bool isEmpty() const { return num_elements == 0u; }
   };
 
-  template<typename T, typename alignment_type = std::uint8_t>
-  using rel_ptr8 = rel_ptr<std::int8_t, T, alignment_type>;
+  template<typename T, std::uint8_t alignment = 1>
+  using rel_ptr8 = rel_ptr<std::int8_t, T, alignment>;
 
-  template<typename T, typename alignment_type = std::uint8_t>
-  using rel_ptr16 = rel_ptr<std::int16_t, T, alignment_type>;
+  template<typename T, std::uint8_t alignment = 1>
+  using rel_ptr16 = rel_ptr<std::int16_t, T, alignment>;
 
-  template<typename T, typename alignment_type = std::uint8_t>
-  using rel_ptr32 = rel_ptr<std::int32_t, T, alignment_type>;
+  template<typename T, std::uint8_t alignment = 1>
+  using rel_ptr32 = rel_ptr<std::int32_t, T, alignment>;
 
-  template<typename T, typename alignment_type = std::uint8_t>
-  using rel_ptr64 = rel_ptr<std::int64_t, T, alignment_type>;
+  template<typename T, std::uint8_t alignment = 1>
+  using rel_ptr64 = rel_ptr<std::int64_t, T, alignment>;
 
-  template<typename T, typename alignment_type = std::uint8_t>
-  using rel_array8 = rel_array<std::uint8_t, rel_ptr8<T, alignment_type>>;
+  template<typename T, std::uint8_t alignment = 1>
+  using rel_array8 = rel_array<std::uint8_t, rel_ptr8<T, alignment>>;
 
-  template<typename T, typename alignment_type = std::uint8_t>
-  using rel_array16 = rel_array<std::uint16_t, rel_ptr16<T, alignment_type>>;
+  template<typename T, std::uint8_t alignment = 1>
+  using rel_array16 = rel_array<std::uint16_t, rel_ptr16<T, alignment>>;
 
-  template<typename T, typename alignment_type = std::uint8_t>
-  using rel_array32 = rel_array<std::uint32_t, rel_ptr32<T, alignment_type>>;
+  template<typename T, std::uint8_t alignment = 1>
+  using rel_array32 = rel_array<std::uint32_t, rel_ptr32<T, alignment>>;
 
-  template<typename T, typename alignment_type = std::uint8_t>
-  using rel_array64 = rel_array<std::uint64_t, rel_ptr64<T, alignment_type>>;
+  template<typename T, std::uint8_t alignment = 1>
+  using rel_array64 = rel_array<std::uint64_t, rel_ptr64<T, alignment>>;
 
 }  // namespace assetio
 

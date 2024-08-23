@@ -24,7 +24,7 @@ namespace assetio
 {
   /*!
    * @brief
-   *   A pointer type that uses a relative signed offset from it's own address.
+   *   A pointer type that uses a relative offset from it's own address.
    *   This allows the pointer to be dumped to disk without an extra deserialization step.
    *
    * @tparam offset_type
@@ -34,8 +34,8 @@ namespace assetio
    *   Datatype that this pointer refers to.
    *
    * @tparam alignment
-   *   If you know the min alignment of all uses of the type pointer to by offset
-   *   you can increase the range by using larger strides.
+   *   If you know the min alignment of all uses of the type pointed you can increase the
+   *   range by using larger strides.
    *
    * @warning
    *   When copying / moving this type be sure to update the `rel_ptr::offset` accordingly.
@@ -46,13 +46,13 @@ namespace assetio
     using value_type  = T;
     using offset_type = offset_type_t;
 
-    static_assert(std::is_integral_v<offset_type> && !std::is_unsigned_v<offset_type>, "offset_type must be a signed integer type.");
+    static_assert(std::is_integral_v<offset_type>, "offset_type must be an integer type.");
     static_assert(alignment > 0, "alignment must be an greater than 0.");
 
     static constexpr offset_type k_OffsetMax = std::numeric_limits<offset_type>::max();
     static constexpr offset_type k_OffsetMin = std::numeric_limits<offset_type>::min();
 
-    alignas(alignment) offset_type offset = 0;  //!< The stored offset from the address of `this`.
+    /* alignas(alignment) */ offset_type offset = 0;  //!< The stored offset from the address of `this`.
 
     rel_ptr() = default;
 
@@ -80,10 +80,8 @@ namespace assetio
 
     T* operator->() const { return get(); }
 
-#if 0 // NOTE(SR): Does not work with rel_ptr<void>, disabled for now...
     T& operator*() const { return *get(); }
     T& operator[](const std::size_t idx) const { return get()[idx]; }
-#endif
 
     // Conversion Operators //
 

@@ -3,17 +3,16 @@
 
   <Type Name="assetio::rel_ptr&lt;*, *, *&gt;">
     <DisplayString Condition="offset == 0">nullptr</DisplayString>
-    <DisplayString Condition="offset != 0">{{{($T2*)(($T3*)this + offset)}, offset = {offset}}}</DisplayString>
+    <DisplayString Condition="offset != 0">{{{($T2*)((unsigned char*)this + (offset * $T3))}, offset = {offset}}}</DisplayString>
 
     <Expand>
       <Item Name="ptr" Condition="offset == 0">(value_type*)nullptr</Item>
-      <Item Name="ptr" Condition="offset != 0">(value_type*)((alignment_type*)this + offset)</Item>
-      <Item Name="[offset]" Condition="k_AlignmentByteCount == 1">offset</Item>
-      <Item Name="[offset (alignment_type)]" Condition="k_AlignmentByteCount != 1">offset</Item>
-      <Item Name="[offset (bytes)]" Condition="k_AlignmentByteCount != 1">k_AlignmentByteCount * offset</Item>
+      <Item Name="ptr" Condition="offset != 0">(value_type*)((unsigned char*)this + (offset *  $T3))</Item>
+      <Item Name="[offset]">offset</Item>
+      <Item Name="[offset (bytes)]">$T3 * offset</Item>
       <Item Name="[offset max]">k_OffsetMax</Item>
       <Item Name="[offset min]">k_OffsetMin</Item>
-      <Item Name="[alignment]">k_AlignmentByteCount</Item>
+      <Item Name="[alignment]"> $T3</Item>
     </Expand>
   </Type>
 

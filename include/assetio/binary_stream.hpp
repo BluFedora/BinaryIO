@@ -12,7 +12,7 @@
  *     [Small Writeup On Byte Order](https://commandcenter.blogspot.com/2012/04/byte-order-fallacy.html)
  *             [Int C Promotion FAQ](http://c-faq.com/expr/preservingrules.html)
  *
- * @copyright Copyright (c) 2021-2023 Shareef Abdoul-Raheem
+ * @copyright Copyright (c) 2021-2024 Shareef Abdoul-Raheem
  */
 /******************************************************************************/
 #ifndef BINARY_STREAM_HPP
@@ -110,6 +110,10 @@ namespace assetio
     ~ByteWriterView() override = default;
   };
 
+  /*!
+   * @brief
+   *   Not all `IByteReader` support seeking, check the return value of IByteReader::seek.
+   */
   enum class SeekOrigin
   {
     BEGIN,
@@ -241,7 +245,7 @@ namespace assetio
 /*
   MIT License
 
-  Copyright (c) 2021-2023 Shareef Abdoul-Raheem
+  Copyright (c) 2021-2024 Shareef Abdoul-Raheem
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal

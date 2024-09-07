@@ -2,12 +2,12 @@
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 
   <Type Name="assetio::rel_ptr&lt;*, *, *&gt;">
-    <DisplayString Condition="offset == 0">nullptr</DisplayString>
-    <DisplayString Condition="offset != 0">{{{($T2*)((unsigned char*)this + (offset * $T3))}, offset = {offset}}}</DisplayString>
+    <DisplayString Condition="offset == k_OffsetInvalid">nullptr</DisplayString>
+    <DisplayString Condition="offset != k_OffsetInvalid">{{{($T2*)((unsigned char*)this + (offset * $T3))}, offset = {offset}}}</DisplayString>
 
     <Expand>
-      <Item Name="ptr" Condition="offset == 0">(value_type*)nullptr</Item>
-      <Item Name="ptr" Condition="offset != 0">(value_type*)((unsigned char*)this + (offset *  $T3))</Item>
+      <Item Name="ptr" Condition="offset == k_OffsetInvalid">(value_type*)nullptr</Item>
+      <Item Name="ptr" Condition="offset != k_OffsetInvalid">(value_type*)((unsigned char*)this + (offset *  $T3))</Item>
       <Item Name="[offset]">offset</Item>
       <Item Name="[offset (bytes)]">$T3 * offset</Item>
       <Item Name="[offset max]">k_OffsetMax</Item>

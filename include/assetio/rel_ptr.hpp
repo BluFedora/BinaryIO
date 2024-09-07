@@ -49,15 +49,16 @@ namespace assetio
     static_assert(std::is_integral_v<offset_type>, "offset_type must be an integer type.");
     static_assert(alignment > 0, "alignment must be an greater than 0.");
 
-    static constexpr offset_type k_OffsetMax = std::numeric_limits<offset_type>::max();
-    static constexpr offset_type k_OffsetMin = std::numeric_limits<offset_type>::min();
+    static constexpr offset_type k_OffsetMax     = std::numeric_limits<offset_type>::max();
+    static constexpr offset_type k_OffsetMin     = std::numeric_limits<offset_type>::min();
+    static constexpr offset_type k_OffsetInvalid = std::is_signed_v<offset_type> ? k_OffsetMin : k_OffsetMax;
 
-    /* alignas(alignment) */ offset_type offset = 0;  //!< The stored offset from the address of `this`.
+    /* alignas(alignment) */ offset_type offset = k_OffsetInvalid;  //!< The stored offset from the address of `this`.
 
     rel_ptr() = default;
 
     rel_ptr(const std::nullptr_t) :
-      offset{0}
+      offset{k_OffsetInvalid}
     {
     }
 
@@ -91,8 +92,8 @@ namespace assetio
     // Misc //
 
     void     assign(T* const rhs) { offset = calculateOffset(rhs, base()); }
-    void     assign(std::nullptr_t) { offset = 0; }
-    bool     isNull() const { return offset == 0; }
+    void     assign(std::nullptr_t) { offset = k_OffsetInvalid; }
+    bool     isNull() const { return offset == k_OffsetInvalid; }
     T*       get() const { return isNull() ? nullptr : reinterpret_cast<T*>(base() + (offset * alignment)); }
     uint8_t* base() const { return reinterpret_cast<uint8_t*>(const_cast<offset_type*>(&offset)); }
 
@@ -116,12 +117,12 @@ namespace assetio
         const std::ptrdiff_t off = (reinterpret_cast<const uint8_t*>(rhs) - base);
 
         binaryIOAssert((static_cast<std::uintptr_t>(off) % alignment) == 0, "Invalid pointer alignment, decrease alignment.");
-        binaryIOAssert(off >= k_OffsetMin && off <= k_OffsetMax, "Pointer out of range, increase offset_type.");
+        binaryIOAssert(off >= k_OffsetMin && off < k_OffsetMax, "Pointer out of range, increase offset_type.");
 
         return static_cast<offset_type>(off / alignment);
       }
 
-      return 0;
+      return k_OffsetInvalid;
     }
 
     friend inline bool operator==(const rel_ptr& lhs, const rel_ptr& rhs) { return lhs.get() == rhs.get(); }

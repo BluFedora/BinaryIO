@@ -14,7 +14,7 @@
 #ifndef BINARY_ASSERTION_HPP
 #define BINARY_ASSERTION_HPP
 
-namespace assetio
+namespace binaryIO
 {
   namespace detail
   {
@@ -22,7 +22,7 @@ namespace assetio
   }  // namespace detail
 }  // namespace assetio
 
-#define binaryIOAssert(expr, msg) ::assetio::detail::binaryIOAssertImpl((expr), #expr, __FILE__, __LINE__, (msg))
+#define binaryIOAssert(expr, msg) ::binaryIO::detail::binaryIOAssertImpl((expr), #expr, __FILE__, __LINE__, (msg))
 
 #endif /* BINARY_ASSERTION_HPP */
 

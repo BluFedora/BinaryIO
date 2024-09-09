@@ -15,6 +15,8 @@
 #ifndef BINARY_CHUNK_HPP
 #define BINARY_CHUNK_HPP
 
+#include "binary_types.hpp"
+
 #include <cstddef>  // size_t
 #include <cstdint>  // uint16_t, uint64_t, uint32_t
 
@@ -84,11 +86,8 @@ inline constexpr void crc32_end(std::uint32_t* in_out_crc)
   *in_out_crc = ~*in_out_crc;
 }
 
-namespace assetio
+namespace binaryIO
 {
-  using VersionType = std::uint16_t;
-  using ChunkTypeID = std::uint32_t;
-
   // Chunked Data Format
   //
   // header                 : BinaryChunkHeader;

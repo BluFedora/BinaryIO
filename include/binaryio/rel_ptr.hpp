@@ -20,7 +20,7 @@
 #include <limits>       // numeric_limits
 #include <type_traits>  // is_integral_v, is_unsigned_v
 
-namespace assetio
+namespace binaryIO
 {
   /*!
    * @brief
@@ -71,6 +71,7 @@ namespace assetio
     rel_ptr(rel_ptr&& rhs)                 = default;
     rel_ptr& operator=(const rel_ptr& rhs) = default;
     rel_ptr& operator=(rel_ptr&& rhs)      = default;
+    ~rel_ptr()                             = default;
 
     // Assignment Operators //
 

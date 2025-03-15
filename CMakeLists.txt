@@ -9,11 +9,11 @@ add_library(
   AssetIO_BinaryIO STATIC
 
     # Headers
-      "include/binaryio/binary_assert.hpp"
+      "include/binaryio/binary_chunk.hpp"
       "include/binaryio/binary_stream.hpp"
       "include/binaryio/binary_stream_ext.hpp"
-      "include/binaryio/rel_ptr.hpp"
       "include/binaryio/binary_types.hpp"
+      "include/binaryio/rel_ptr.hpp"
 
     # Sources
       "src/binary_io.cpp"

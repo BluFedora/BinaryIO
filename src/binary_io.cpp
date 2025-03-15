@@ -6,10 +6,9 @@
  * @brief
  *   Implementation of any code that doesnt belong in the header.
  *
- * @copyright Copyright (c) 2022-2024 Shareef Abdoul-Raheem
+ * @copyright Copyright (c) 2022-2025 Shareef Abdoul-Raheem
  */
 /******************************************************************************/
-#include "binaryio/binary_assert.hpp"
 #include "binaryio/binary_chunk.hpp"
 #include "binaryio/binary_stream.hpp"
 #include "binaryio/binary_stream_ext.hpp"
@@ -470,7 +469,7 @@ static binaryIO::IOErrorCode Generic_Refill(binaryIO::IOStream* const stream)
 /*
   MIT License
 
-  Copyright (c) 2022-2024 Shareef Abdoul-Raheem
+  Copyright (c) 2022-2025 Shareef Abdoul-Raheem
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal

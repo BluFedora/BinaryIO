@@ -8,13 +8,13 @@
  *   References:
  *     [https://steamcdn-a.akamaihd.net/apps/valve/2015/Migdalskiy_Sergiy_Physics_Optimization_Strategies.pdf]
  *
- * @copyright Copyright (c) 2021-2024 Shareef Abdoul-Raheem
+ * @copyright Copyright (c) 2021-2025 Shareef Abdoul-Raheem
  */
 /******************************************************************************/
 #ifndef REL_PTR_HPP
 #define REL_PTR_HPP
 
-#include "binary_assert.hpp"  // binaryIOAssert
+#include "binary_types.hpp"  // binaryIOAssert
 
 #include <cstdint>      // int8_t, int16_t, int32_t int64_t, uint8_t, uint16_t, uint32_t uint64_t
 #include <limits>       // numeric_limits
@@ -184,7 +184,7 @@ namespace binaryIO
   template<typename T, std::uint8_t alignment = 1>
   using rel_array64 = rel_array<std::uint64_t, rel_ptr64<T, alignment>>;
 
-}  // namespace assetio
+}  // namespace binaryIO
 
 #endif /* REL_PTR_HPP */
 
@@ -192,7 +192,7 @@ namespace binaryIO
 /*
   MIT License
 
-  Copyright (c) 2021-2024 Shareef Abdoul-Raheem
+  Copyright (c) 2021-2025 Shareef Abdoul-Raheem
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal

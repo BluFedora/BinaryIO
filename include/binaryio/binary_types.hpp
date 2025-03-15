@@ -6,7 +6,9 @@
  * @brief
  *   Lightweight header defining the types maintained by this library.
  *
- * @copyright Copyright (c) 2024 Shareef Abdoul-Raheem
+ * @todo Variadic args for error message to assert.
+ *
+ * @copyright Copyright (c) 2024-2025 Shareef Abdoul-Raheem
  */
 /******************************************************************************/
 #ifndef BINARYIO_TYPE_HPP
@@ -40,7 +42,7 @@ namespace binaryIO
 
   /*!
    * @brief
-   *   Not all `IByteReader` support seeking, check the return value of IByteReader::seek.
+   *   Not all `IOStream` support seeking, check the return value of IByteReader::seek.
    */
   enum class SeekOrigin : std::uint8_t
   {
@@ -83,7 +85,14 @@ namespace binaryIO
   struct BinaryChunkTypeID;
   enum class BinaryChunkParts : std::uint32_t;
 
+  namespace detail
+  {
+    bool binaryIOAssertImpl(const bool expr, const char* const expr_str, const char* const filename, const int line_number, const char* const assert_msg);
+  }  // namespace detail
+
 }  // namespace binaryIO
+
+#define binaryIOAssert(expr, msg) ::binaryIO::detail::binaryIOAssertImpl((expr), #expr, __FILE__, __LINE__, (msg))
 
 #endif /* BINARYIO_TYPE_HPP */
 
@@ -91,7 +100,7 @@ namespace binaryIO
 /*
   MIT License
 
-  Copyright (c) 2024 Shareef Abdoul-Raheem
+  Copyright (c) 2024-2025 Shareef Abdoul-Raheem
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal

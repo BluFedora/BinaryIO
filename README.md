@@ -1,4 +1,4 @@
-# BinaryIO : C++ library for managing binary data streams
+# BinaryIO : C++ library for dealing with and designing binary file formats
 
 ![Windows Build Badge](https://github.com/BluFedora/BinaryIO/actions/workflows/build_windows.yml/badge.svg)
 ![Linux Build Badge](https://github.com/BluFedora/BinaryIO/actions/workflows/build_linux.yml/badge.svg)
@@ -6,8 +6,6 @@
 
 BinaryIO is a small C++ library for a unified binary stream interface
 with some helpers for easily implementing custom binary file formats.
-
-[binaryio/binary_assert.hpp](include/binaryio/binary_assert.hpp): Contains the `binaryIOAssert` assertion macro.
 
 [binaryio/binary_chunk.hpp](include/binaryio/binary_chunk.hpp): Contains datatypes for a simple chunk based binary file format.
 
@@ -27,13 +25,14 @@ with some helpers for easily implementing custom binary file formats.
 
 [binaryio/binary_types.hpp](include/binaryio/binary_types.hpp) : Forward declarations of the types defined by this library.
 
-- `IOSize`      : Size type used for IO operations.
-- `IOOffset`    : Type used for seek operations.
-- `VersionType` : Type used for the version field in the chunk binary format.
-- `ChunkTypeID` : Type used for the type id field in the chunk binary format.
-- `IOErrorCode` : Enum containing all error codes possible from this library.
-- `SeekOrigin`  : Defined the starting point of the seek operation.
-- `IOResult`    : Compressed pair of IOSize and IOErrorCode, result from most IO operations.
+- `IOSize`         : Size type used for IO operations.
+- `IOOffset`       : Type used for seek operations.
+- `VersionType`    : Type used for the version field in the chunk binary format.
+- `ChunkTypeID`    : Type used for the type id field in the chunk binary format.
+- `IOErrorCode`    : Enum containing all error codes possible from this library.
+- `SeekOrigin`     : Defined the starting point of the seek operation.
+- `IOResult`       : Compressed pair of IOSize and IOErrorCode, result from most IO operations.
+- `binaryIOAssert` : Assertion macro for checking programming mistakes.
 
 [binaryio/rel_ptr.hpp](include/binaryio/rel_ptr.hpp): Contains a pointer type that stores the relative offset from itself to the pointed object for making memory mappable binary file formats.
 

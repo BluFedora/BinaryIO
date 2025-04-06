@@ -32,7 +32,7 @@ namespace binaryIO
   IOStream IOStream_FromVector(std::vector<uint8_t, Allocator>* const buffer)
   {
     IOStream result = {};
-    result.Size     = +[](const IOStream* const stream) -> IOResult {
+    result.Size     = +[](IOStream* const stream) -> IOResult {
       const std::vector<uint8_t, Allocator>* const buffer = static_cast<std::vector<uint8_t, Allocator>*>(stream->user_data.values[0].as_handle);
 
       return buffer->size();

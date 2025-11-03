@@ -116,7 +116,7 @@ namespace binaryIO
     return BinaryChunkParts(std::uint32_t(lhs) & std::uint32_t(rhs));
   }
 
-  inline constexpr ChunkTypeID MakeBinaryChunkTypeID(const char (&id)[4 + 1 /* NUL Terminated */])
+  inline constexpr ChunkTypeID MakeChunkTypeID(const char (&id)[4 + 1 /* NUL Terminated */])
   {
     return (ChunkTypeID(id[0]) << 0u) | (ChunkTypeID(id[1]) << 8u) |
            (ChunkTypeID(id[2]) << 16u) | (ChunkTypeID(id[3]) << 24u);
@@ -132,7 +132,7 @@ namespace binaryIO
     }
 
     constexpr BinaryChunkTypeID(const char (&id)[4 + 1 /* NUL Terminated */]) :
-      type_id{MakeBinaryChunkTypeID(id)}
+      type_id{MakeChunkTypeID(id)}
     {
     }
 

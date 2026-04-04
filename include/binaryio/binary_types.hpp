@@ -33,9 +33,7 @@ namespace binaryIO
     Success,            //!< No error occurred.
     EndOfStream,        //!< No more data in stream.
     AllocationFailure,  //!< Failed to allocate memory for internal stream operations.
-    ReadError,          //!< Failed to get more data from stream.
-    SeekError,          //!< Invalid seek location.
-    InvalidData,        //!< Parse error.
+    FailedOperation,    //!< Could not do requested operation.
     InvalidOperation,   //!< Invalid Operation
     UnknownError,       //!< Unknown failure.
   };

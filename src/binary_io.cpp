@@ -115,7 +115,7 @@ static binaryIO::IOResult MemoryStream_Seek(binaryIO::IOStream* const stream, co
   }
   else
   {
-    err_code = binaryIO::IOErrorCode::SeekError;
+    err_code = binaryIO::IOErrorCode::FailedOperation;
   }
 
   return binaryIO::IOResult(stream->user_data.memory_stream.cursor, err_code);
@@ -355,7 +355,7 @@ static binaryIO::IOResult CFile_Read(binaryIO::IOStream* const stream, void* con
   }
 
   const std::size_t           num_bytes_read = std::fread(destination, sizeof(unsigned char), num_destination_bytes, file_handle);
-  const binaryIO::IOErrorCode error_code     = (num_bytes_read == num_destination_bytes) ? binaryIO::IOErrorCode::Success : binaryIO::IOErrorCode::ReadError;
+  const binaryIO::IOErrorCode error_code     = (num_bytes_read == num_destination_bytes) ? binaryIO::IOErrorCode::Success : binaryIO::IOErrorCode::FailedOperation;
 
   return binaryIO::IOResult(num_bytes_read, error_code);
 }
@@ -409,7 +409,7 @@ static binaryIO::IOResult CFile_Seek(binaryIO::IOStream* const stream, const bin
     }
   }
 
-  return binaryIO::IOErrorCode::SeekError;
+  return binaryIO::IOErrorCode::FailedOperation;
 }
 
 static binaryIO::IOErrorCode CFile_Close(binaryIO::IOStream* const stream)

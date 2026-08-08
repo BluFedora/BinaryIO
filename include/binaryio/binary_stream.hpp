@@ -147,21 +147,21 @@ namespace binaryIO
     using UnderlyingType = typename UnderlyingTypeImpl<T, std::is_enum_v<T>>::type;
 
     template<typename T, typename F>
-    IOResult writeXEndian(IOStream* const stream, const T value, F&& convertIndex) noexcept
+    IOResult writeXEndian(IOStream* const stream, const T value, F&& ConvertIndex) noexcept
     {
       static_assert(std::is_integral_v<T> || std::is_enum_v<T>, "Byte ordering is for integral types.");
 
       std::uint8_t bytes[sizeof(T)];
       for (std::size_t i = 0u; i < sizeof(T); ++i)
       {
-        bytes[convertIndex(i)] = (static_cast<UnderlyingType<T>>(value) >> (i * CHAR_BIT)) & 0xFF;
+        bytes[ConvertIndex(i)] = (static_cast<UnderlyingType<T>>(value) >> (i * CHAR_BIT)) & 0xFF;
       }
 
       return IOStream_Write(stream, bytes, sizeof(bytes));
     }
 
     template<typename T, typename F>
-    IOResult readXEndian(IOStream* const stream, T* out_value, F&& convertIndex) noexcept
+    IOResult readXEndian(IOStream* const stream, T* out_value, F&& ConvertIndex) noexcept
     {
       static_assert(std::is_integral_v<T> || std::is_enum_v<T>, "Byte ordering is for integral types.");
 
@@ -176,7 +176,7 @@ namespace binaryIO
 
         for (std::size_t i = 0u; i < sizeof(T); ++i)
         {
-          value |= UT(UT(bytes[convertIndex(i)]) << (i * CHAR_BIT));
+          value |= UT(UT(bytes[ConvertIndex(i)]) << (i * CHAR_BIT));
         }
 
         *out_value = static_cast<T>(value);

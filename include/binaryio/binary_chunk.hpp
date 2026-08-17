@@ -96,26 +96,6 @@ namespace binaryIO
   // footer                 : BinaryChunkFooter;
   //
 
-  enum class BinaryChunkParts : std::uint32_t
-  {
-    Header           = (1 << 0),
-    Data             = (1 << 1),
-    Footer           = (1 << 2),
-    HeaderData       = Header | Data,
-    HeaderFooter     = Header | Footer,
-    DataFooter       = Data | Footer,
-    HeaderDataFooter = Header | Data | Footer,
-  };
-  inline BinaryChunkParts operator|(const BinaryChunkParts lhs, const BinaryChunkParts rhs)
-  {
-    return BinaryChunkParts(std::uint32_t(lhs) | std::uint32_t(rhs));
-  }
-
-  inline BinaryChunkParts operator&(const BinaryChunkParts lhs, const BinaryChunkParts rhs)
-  {
-    return BinaryChunkParts(std::uint32_t(lhs) & std::uint32_t(rhs));
-  }
-
   inline constexpr ChunkTypeID MakeChunkTypeID(const char (&id)[4 + 1 /* NUL Terminated */])
   {
     return (ChunkTypeID(id[0]) << 0u) | (ChunkTypeID(id[1]) << 8u) |
@@ -179,22 +159,6 @@ namespace binaryIO
       data_size{0u}
     {
     }
-
-    std::uint64_t sizeInfo(const BinaryChunkParts parts = BinaryChunkParts::HeaderDataFooter) const
-    {
-      std::uint64_t result = 0u;
-
-      if (std::uint32_t(parts & BinaryChunkParts::Header) != 0u) { result += header_size; }
-      if (std::uint32_t(parts & BinaryChunkParts::Data) != 0u) { result += data_size; }
-      if (std::uint32_t(parts & BinaryChunkParts::Footer) != 0u) { result += sizeof(BinaryChunkFooter); }
-
-      return result;
-    }
-
-    BinaryChunkHeader* header() { return this; }
-    void*              data() { return reinterpret_cast<char*>(header()) + header_size; }
-    BinaryChunkFooter* footer() { return reinterpret_cast<BinaryChunkFooter*>(reinterpret_cast<char*>(data()) + data_size); }
-    const void*        endOfChunk() { return footer() + 1u; }
   };
   static_assert(sizeof(BinaryChunkHeader) == 16u, "");
 

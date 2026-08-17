@@ -81,7 +81,6 @@ namespace binaryIO
 
   struct BinaryChunkHeader;
   struct BinaryChunkTypeID;
-  enum class BinaryChunkParts : std::uint32_t;
 
   namespace detail
   {

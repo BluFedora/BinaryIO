@@ -49,8 +49,8 @@ namespace binaryIO
     static_assert(std::is_integral_v<offset_type>, "offset_type must be an integer type.");
     static_assert(alignment > 0, "alignment must be an greater than 0.");
 
-    static constexpr offset_type k_OffsetMax     = std::numeric_limits<offset_type>::max();
-    static constexpr offset_type k_OffsetMin     = std::numeric_limits<offset_type>::min();
+    static constexpr offset_type k_OffsetMax     = (std::numeric_limits<offset_type>::max)();
+    static constexpr offset_type k_OffsetMin     = (std::numeric_limits<offset_type>::min)();
     static constexpr offset_type k_OffsetInvalid = std::is_signed_v<offset_type> ? k_OffsetMin : k_OffsetMax;
 
     /* alignas(alignment) */ offset_type offset = k_OffsetInvalid;  //!< The stored offset from the address of `this`.

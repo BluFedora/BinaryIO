@@ -108,7 +108,7 @@ namespace binaryIO
         return IOErrorCode::Success;
       }
 
-      return IOErrorCode::SeekError;
+      return IOErrorCode::FailedOperation;
     };
     result.Close                         = nullptr;
     result.user_data.values[0].as_handle = buffer;

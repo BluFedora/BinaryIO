@@ -82,8 +82,8 @@ namespace binaryIO
 
     T* operator->() const { return get(); }
 
-    T& operator*() const { return *get(); }
-    T& operator[](const std::size_t idx) const { return get()[idx]; }
+    //T& operator*() const { return *get(); }
+    //T& operator[](const std::size_t idx) const { return get()[idx]; }
 
     // Conversion Operators //
 

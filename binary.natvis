@@ -1,32 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 
-  <Type Name="binaryIO::rel_ptr&lt;*, *, *&gt;">
-    <DisplayString Condition="offset == k_OffsetInvalid">nullptr</DisplayString>
-    <DisplayString Condition="offset != k_OffsetInvalid">{{{($T2*)((unsigned char*)this + (offset * $T3))}, offset = {offset}}}</DisplayString>
+    <Type Name="binaryIO::rel_ptr&lt;*, *, *&gt;">
+        <DisplayString Condition="offset == k_OffsetInvalid">nullptr</DisplayString>
+        <DisplayString Condition="offset != k_OffsetInvalid">{{{($T2*)((unsigned char*)this + (offset * $T3))}, offset = {offset}}}</DisplayString>
 
-    <Expand>
-      <Item Name="ptr" Condition="offset == k_OffsetInvalid">(value_type*)nullptr</Item>
-      <Item Name="ptr" Condition="offset != k_OffsetInvalid">(value_type*)((unsigned char*)this + (offset *  $T3))</Item>
-      <Item Name="[offset]">offset</Item>
-      <Item Name="[offset (bytes)]">$T3 * offset</Item>
-      <Item Name="[offset max]">k_OffsetMax</Item>
-      <Item Name="[offset min]">k_OffsetMin</Item>
-      <Item Name="[alignment]"> $T3</Item>
-    </Expand>
-  </Type>
+        <Expand>
+            <Item Name="ptr" Condition="offset == k_OffsetInvalid">(value_type*)nullptr</Item>
+            <Item Name="ptr" Condition="offset != k_OffsetInvalid">(value_type*)((unsigned char*)this + (offset *  $T3))</Item>
+            <Item Name="[offset]">offset</Item>
+            <Item Name="[offset (bytes)]">$T3 * offset</Item>
+            <Item Name="[offset max]">k_OffsetMax</Item>
+            <Item Name="[offset min]">k_OffsetMin</Item>
+            <Item Name="[alignment]"> $T3</Item>
+        </Expand>
+    </Type>
 
-  <Type Name="binaryIO::rel_array&lt;*, *&gt;">
-    <DisplayString>{{ num_elements={num_elements} }}</DisplayString>
+    <Type Name="binaryIO::rel_array&lt;*, binaryIO::rel_ptr&lt;*, *, *&gt;&gt;">
+        <DisplayString>{{ size = {num_elements} }} </DisplayString>
 
-    <Expand>
-      <Item Name="[num_elements]">num_elements</Item>
-      <ArrayItems>
-        <Size>num_elements</Size>
-        <ValuePointer>
-          (value_type*)((alignment_type*)&amp;elements + elements.offset)
-        </ValuePointer>
-      </ArrayItems>
-    </Expand>
-  </Type>
+        <Expand>
+            <Item Name="size">num_elements</Item>
+            <Item Name="data">elements</Item>
+
+            <Item Name="elements" Condition="elements.offset != elements.k_OffsetInvalid">
+                ($T3*)((unsigned char*)&amp;elements.offset + (elements.offset * $T4)),[num_elements]
+            </Item>
+
+            <Item Name="elements" Condition="elements.offset == elements.k_OffsetInvalid">
+                ($T3*)nullptr
+            </Item>
+        </Expand>
+    </Type>
 </AutoVisualizer>
